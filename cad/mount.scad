@@ -60,8 +60,15 @@ side_wall_z1 = 95;                   // outer wall stops here: the rear gap is
 eave_depth = 3;                      // how far the eave reaches over the bay
 eave_squeeze = 0.2;                  // interference against the chamfer face
 ont_top = ont_y0 + ont_h;
-// contact height of the 45° underside at each wall face (same both sides)
+// contact height of the 45° underside at each wall face (same both sides,
+// and at the panel rear face — front clearance is also clr)
 eave_y = ont_top - ont_chamfer - clr - eave_squeeze;
+
+// Front brow: extra meat on the panel's +y edge reaching +z past the ONT's
+// front-top chamfer, grabbing it with the same 45°-parallel underside. Only
+// OUTSIDE the LED window's x span — a full-width brow would sit behind the
+// window and block the lights. Engages over the last ~7 mm of insertion.
+brow_z1 = 14;                        // rear extent; chamfer face ends at 12.9
 
 // LED window: the bevel is the ONT's top-front edge (chamfer face ~7.4)
 win_y0 = ont_y0 + ont_h - 9;
@@ -131,6 +138,11 @@ module mount_right() {
     translate([0, 0, panel_t]) linear_extrude(mate_z1 - panel_t)
         polygon([[mate_wall_t, eave_y], [mate_wall_t + eave_depth, eave_y + eave_depth],
                  [mate_wall_t + eave_depth, wall_top], [mate_wall_t, wall_top]]);
+    // front brow segments flanking the LED window
+    for (xr = [[0, win_x0], [win_x1, cage_x1]])
+        translate([xr[0], 0, 0]) rotate([90, 0, 90]) linear_extrude(xr[1] - xr[0])
+            polygon([[eave_y, panel_t], [eave_y + brow_z1 - panel_t, brow_z1],
+                     [panel_h, brow_z1], [panel_h, panel_t]]);
 }
 
 mount_right();
