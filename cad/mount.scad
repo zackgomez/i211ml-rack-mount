@@ -46,16 +46,22 @@ shelf_t = 4;
 ont_y0 = shelf_y0 + shelf_t;         // ONT bottom
 bay_d = ont_w + 2 * clr;
 cage_z1 = panel_t + bay_d + wall;    // rear face of the rear posts
-post_top = ont_y0 + ont_h + 3;       // posts end just above the ONT
-lip_y0 = ont_y0 + ont_h + clr;       // rear lips trap the ONT top
-post_len = 14;                       // rear post length in x — kept narrow so
-                                     // the posts only touch the ONT's rear
-                                     // face at the chamfered corners, clear
-                                     // of the coax (left) and ports
-mate_z1 = 64;                        // mating flange depth
+wall_top = ont_y0 + ont_h + 3;       // side walls end just above the ONT
+mate_z1 = 64;                        // mating flange depth — needs more meat
+                                     // once joint hardware is chosen
 side_wall_z1 = 95;                   // outer wall stops here: the rear gap is
                                      // the fiber exit (SC/APC cover is on the
                                      // ONT's outer end face)
+
+// Top eaves: narrow vaulted ledges along both side walls whose 45° underside
+// lies parallel to (and just interferes with) the ONT's top-edge chamfers —
+// slight friction fit hugging the chamfered edges, self-centering. The ONT
+// slides in from the rear. Pure wall cross-section in print orientation.
+eave_depth = 3;                      // how far the eave reaches over the bay
+eave_squeeze = 0.2;                  // interference against the chamfer face
+ont_top = ont_y0 + ont_h;
+// contact height of the 45° underside at each wall face (same both sides)
+eave_y = ont_top - ont_chamfer - clr - eave_squeeze;
 
 // LED window: the bevel is the ONT's top-front edge (chamfer face ~7.4)
 win_y0 = ont_y0 + ont_h - 9;
@@ -100,14 +106,7 @@ module mount_right() {
             translate([0, shelf_y0, 0])                              // shelf
                 cube([cage_x1, shelf_t, cage_z1]);
             translate([bay_x1, 0, 0])                                // outer cage wall,
-                cube([wall, post_top, side_wall_z1]);                // rear gap = fiber exit
-            // rear corner posts with top lips trapping the ONT's back edge
-            for (x0 = [bay_x0, bay_x1 - post_len]) translate([x0, 0, 0]) {
-                translate([0, shelf_y0, cage_z1 - wall])
-                    cube([post_len, post_top - shelf_y0, wall]);
-                translate([0, lip_y0, cage_z1 - wall - 8])
-                    cube([post_len, post_top - lip_y0, wall + 8]);
-            }
+                cube([wall, wall_top, side_wall_z1]);                // rear gap = fiber exit
         }
         // ONT bay (also trims lip overhang back to the bay)
         translate([bay_x0, ont_y0, panel_t])
@@ -125,6 +124,13 @@ module mount_right() {
         // shelf vents
         hex_holes(bay_x0 + 8, cage_x1 - 8, panel_t + 8, cage_z1 - 8);
     }
+    // top eaves (added after the bay cut — they intentionally reach into it)
+    translate([0, 0, panel_t]) linear_extrude(side_wall_z1 - panel_t)
+        polygon([[bay_x1, eave_y], [bay_x1 - eave_depth, eave_y + eave_depth],
+                 [bay_x1 - eave_depth, wall_top], [bay_x1, wall_top]]);
+    translate([0, 0, panel_t]) linear_extrude(mate_z1 - panel_t)
+        polygon([[mate_wall_t, eave_y], [mate_wall_t + eave_depth, eave_y + eave_depth],
+                 [mate_wall_t + eave_depth, wall_top], [mate_wall_t, wall_top]]);
 }
 
 mount_right();
