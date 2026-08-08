@@ -1,0 +1,201 @@
+// Verizon I-211M-L ONT + inline power brick — reference solids
+// All primary dims calipers, 2026-08-08.
+// Axes: x = along the rack face, y = depth, z = up; devices lying flat.
+// Origin: bottom-left-front corner of each body's bounding box.
+
+// Octagonal profile: w x h rectangle with corners cut c.
+// bottom=false leaves the two bottom corners sharp.
+function _prof(w, h, c, bottom = true) = bottom
+    ? [[c, 0], [w - c, 0], [w, c], [w, h - c], [w - c, h], [c, h], [0, h - c], [0, c]]
+    : [[0, 0], [w, 0], [w, h - c], [w - c, h], [c, h], [0, h - c]];
+
+// Box with 45-degree chamfer c on edges.
+// bottom=false: edges of the bottom face stay sharp (vertical edges still cut).
+module chamfered_box(x, y, z, c, bottom = true) {
+    intersection() {
+        linear_extrude(z)                            // vertical edges
+            polygon(_prof(x, y, c));
+        translate([0, y, 0]) rotate([90, 0, 0])      // edges running along y
+            linear_extrude(y) polygon(_prof(x, z, c, bottom));
+        rotate([90, 0, 90])                          // edges running along x
+            linear_extrude(x) polygon(_prof(y, z, c, bottom));
+    }
+}
+
+// ---------------- ONT ----------------
+ont_l = 227;          // x, soft tape +-2
+ont_w = 148;          // y, calipers
+ont_h = 33;           // z, calipers
+ont_chamfer_face = 10.5;              // calipers, width of the 45° chamfer FACE,
+ont_chamfer = ont_chamfer_face / sqrt(2);  // -> ~7.4 leg; ALL edges incl. LED bevel
+
+// Connector edge = one long (x) edge -> faces rack rear.
+// LED bevel = opposite long edge -> faces rack front.
+
+module ont() {
+    chamfered_box(ont_l, ont_w, ont_h, ont_chamfer);
+}
+
+// ---------------- Power brick ----------------
+// Calipers except where noted. Envelope quirk: sides bow out ("diamond") —
+// widest ~1.2 mm proud of the chamfer edge at mid-height (rough measurement).
+// 124 x 88 are max-envelope caliper numbers, so pockets sized off these are
+// safe; the body is just a touch slimmer near top and bottom.
+brick_l = 124;        // x
+brick_w = 88;         // y
+brick_h = 44;         // z
+brick_chamfer = 6;    // top-face perimeter only
+brick_corner_r = 2.5; // vertical edges "lightly rounded" — eyeball value
+
+// Mounting tabs on BOTH x ends: bottom-flush wedges, thick at the body,
+// sloping down to a FLAT RUN at min height out to the tip.
+tab_len = 11;         // x, how far each sticks out
+tab_w = 12.5;         // y
+tab_r = 2.5;          // outer vertical edges "moderately rounded" — eyeball
+tabm_h_min = 3.8;  tabm_h_max = 8.2;  tabm_flat = 4;   // -x tab
+tabp_h_min = 3.3;  tabp_h_max = 7.0;  tabp_flat = 3;   // +x tab
+
+// plan footprint of a tab, tip corners rounded; tip at x=0, or at x=tab_len
+// with tip_right=true (built directly, not mirror()ed — mirrored 2D reverses
+// winding and CGAL rejects the extruded intersection as non-closed)
+module _tab_plan(tip_right = false) {
+    cx = tip_right ? tab_len - tab_r : tab_r;
+    hull() {
+        translate([tip_right ? 0 : tab_len - 1, 0]) square([1, tab_w]);
+        translate([cx, tab_r]) circle(tab_r, $fn = 32);
+        translate([cx, tab_w - tab_r]) circle(tab_r, $fn = 32);
+    }
+}
+
+// Cord-exit protrusion on the +x end (soft tape). Modeled as its full
+// envelope box — the taper is ignored on purpose, pockets must clear it anyway.
+// ---- cord shroud (+x end) ----
+// TWO cords exit the +x end (stub cylinders below — leave the whole +x face
+// open in the mount):
+//   1. body cord, toward the +y edge of the body's +x face
+//   2. output cord, locked in by the cord shroud (strain relief), leaving the
+//      shroud's tip face on the -y side of the +x tab
+// The +x tab hangs off the FAR (+x) END of the shroud, bottom-flush, centered
+// on the shroud's y span. A small cylindrical greeble sits on the +y side of
+// the tab on the same face.
+shroud_len = 38;      // x beyond the body
+shroud_y0 = 6;        // margin from the -y edge (calipers)
+shroud_w = 53;        // y
+shroud_drop = 14;     // its flat top sits this far below the brick top
+shroud_h_tip = 22.3;  // height of the tip face (calipers)
+shroud_h_root = brick_h - shroud_drop;
+shroud_r = 2.5;       // all edges moderately rounded EXCEPT the floor
+tabp_y = shroud_y0 + (shroud_w - tab_w) / 2;   // +x tab centered on the shroud
+
+// Cords Ø6 (calipers). y of the body cord still TODO calipers.
+cord_d = 6;
+cord_stub = 25;                      // how far bare-cord stubs poke out
+
+// Body cord strain relief: stacked in +x off the body face — rect slab, then
+// cylinder, then the cord. Max z extent of the relief = brick_h/2 (calipers).
+srA_rect_x = 2.5;                    // slab thickness in x
+srA_wh = 15;                         // slab is 15 x 15 in y/z; cylinder Ø15
+srA_cyl_len = 12.5;
+srA_top = brick_h / 2;               // top of the whole relief stack
+cordA_y = brick_w - 10 - cord_d / 2; // TODO calipers — "a bit more -y" than 6
+cordA_z = srA_top - srA_wh / 2;      // relief + cord centerline (14.5)
+
+// Shroud cord: top of cord 4.8 (calipers) below the tip face's max z
+cordB_y = (shroud_y0 + tabp_y) / 2;  // -y side of the tab
+cordB_z = shroud_h_tip - 4.8 - cord_d / 2;
+
+// greeble on the +y side of the tab: an unpopulated cord exit ("cord hat").
+// Half-spool, its y and z mirroring the shroud cord across the tab: shaft
+// then lip stacked in +x, center drilled out Ø6 (cord-sized), then cut at
+// the axis z-plane — flat below, half-round above. All calipers.
+greeble_shaft_len = 6.7;  greeble_shaft_d = 8;
+greeble_lip_len = 2;      greeble_lip_d = 10;
+greeble_y = (tabp_y + tab_w + shroud_y0 + shroud_w) / 2;  // cordB_y mirrored
+greeble_z = shroud_h_tip - 4.8 - cord_d / 2;              // = cordB_z
+
+module brick() {
+    // body: rounded vertical edges, 45° chamfer around the top face only
+    intersection() {
+        linear_extrude(brick_h)
+            offset(r = brick_corner_r) offset(delta = -brick_corner_r)
+                square([brick_l, brick_w]);
+        translate([0, brick_w, 0]) rotate([90, 0, 0])
+            linear_extrude(brick_w) polygon(_prof(brick_l, brick_h, brick_chamfer, false));
+        rotate([90, 0, 90])
+            linear_extrude(brick_l) polygon(_prof(brick_w, brick_h, brick_chamfer, false));
+    }
+    // Tab profiles overshoot the plan footprint by 0.5 on both x ends so the
+    // rounded _tab_plan governs the tip cleanly (avoids coincident-face CGAL
+    // errors); the body-side overshoot is swallowed by the union.
+    // -x tab: x=0 at tip; flat run at h_min from the tip, then slope up to
+    // h_max at the body
+    translate([-tab_len, (brick_w - tab_w) / 2, 0]) intersection() {
+        translate([0, tab_w, 0]) rotate([90, 0, 0]) linear_extrude(tab_w)
+            polygon([[-0.5, 0], [tab_len + 0.5, 0], [tab_len + 0.5, tabm_h_max],
+                     [tabm_flat, tabm_h_min], [-0.5, tabm_h_min]]);
+        translate([0, 0, -0.5]) linear_extrude(tabm_h_max + 1.5) _tab_plan();
+    }
+    // +x tab: hangs off the far end of the cord shroud. x=0 at the tip face;
+    // slope down from h_max to a flat run at h_min ending at the tip
+    translate([brick_l + shroud_len, tabp_y, 0]) intersection() {
+        translate([0, tab_w, 0]) rotate([90, 0, 0]) linear_extrude(tab_w)
+            polygon([[-0.5, 0], [tab_len + 0.5, 0], [tab_len + 0.5, tabp_h_min],
+                     [tab_len - tabp_flat, tabp_h_min], [-0.5, tabp_h_max]]);
+        translate([0, 0, -0.5]) linear_extrude(tabp_h_max + 1.5)
+            _tab_plan(tip_right = true);
+    }
+    // cord shroud: flush with the bottom, 6 mm off the -y edge. Side profile
+    // traced 2026-08-08: flat top at root height, knee curving down to the
+    // 22.3-tall tip face (knee polyline is a conservative estimate).
+    // Rounding: minkowski with a TOP-half sphere rounds every edge r2.5
+    // except the floor perimeter, and keeps the floor itself flat. The
+    // operand profile is shrunk by r on each affected side; the root end
+    // overshoots into the body, which the union swallows.
+    minkowski() {
+        translate([brick_l, shroud_y0 + shroud_w - shroud_r, 0]) rotate([90, 0, 0])
+            linear_extrude(shroud_w - 2 * shroud_r) polygon([
+                [0, 0], [shroud_len - shroud_r, 0],
+                [shroud_len - shroud_r, shroud_h_tip - shroud_r],
+                [shroud_len - 14, shroud_h_root - 2 - shroud_r],
+                [8, shroud_h_root - shroud_r], [0, shroud_h_root - shroud_r],
+            ]);
+        intersection() {
+            sphere(shroud_r, $fn = 24);
+            translate([-shroud_r, -shroud_r, 0])
+                cube([2 * shroud_r, 2 * shroud_r, shroud_r]);
+        }
+    }
+    // body cord strain relief stack: slab -> cylinder -> cord
+    translate([brick_l - 0.5, cordA_y - srA_wh / 2, srA_top - srA_wh])
+        cube([srA_rect_x + 0.5, srA_wh, srA_wh]);
+    translate([brick_l + srA_rect_x - 0.5, cordA_y, cordA_z]) rotate([0, 90, 0])
+        cylinder(h = srA_cyl_len + 0.5, d = srA_wh, $fn = 32);
+    translate([brick_l + srA_rect_x + srA_cyl_len - 0.5, cordA_y, cordA_z])
+        rotate([0, 90, 0]) cylinder(h = cord_stub, d = cord_d, $fn = 24);
+    // shroud (output) cord
+    translate([brick_l + shroud_len - 1, cordB_y, cordB_z]) rotate([0, 90, 0])
+        cylinder(h = cord_stub + 1, d = cord_d, $fn = 24);
+    // greeble on the tip face, +y of the tab: hollow cord hat, flat below
+    // the axis plane
+    translate([brick_l + shroud_len - 0.5, greeble_y, greeble_z]) difference() {
+        intersection() {
+            rotate([0, 90, 0]) {
+                cylinder(h = greeble_shaft_len + 0.5, d = greeble_shaft_d, $fn = 32);
+                translate([0, 0, greeble_shaft_len + 0.5])
+                    cylinder(h = greeble_lip_len, d = greeble_lip_d, $fn = 32);
+            }
+            translate([-1, -greeble_lip_d, 0])
+                cube([greeble_shaft_len + greeble_lip_len + 2, greeble_lip_d * 2, greeble_lip_d]);
+        }
+        rotate([0, 90, 0]) translate([0, 0, -1])
+            cylinder(h = greeble_shaft_len + greeble_lip_len + 2.5, d = cord_d, $fn = 24);
+    }
+}
+
+// ---------------- preview ----------------
+// Included files render this too unless they set show_devices = false.
+show_devices = true;
+if (show_devices) {
+    ont();
+    translate([0, ont_w + 30, 0]) brick();
+}
