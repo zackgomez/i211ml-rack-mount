@@ -47,6 +47,11 @@ brick_h = 44;         // z
 brick_chamfer = 6;    // top-face perimeter only
 brick_corner_r = 2.5; // vertical edges "lightly rounded" — eyeball value
 
+// shell parting line: groove around the body at the z-center plane where the
+// two plastic shell halves mate
+seam_h = 1;           // z height of the groove
+seam_d = 1;           // how deep it cuts into the x/y faces
+
 // Mounting tabs on BOTH x ends: bottom-flush wedges, thick at the body,
 // sloping down to a FLAT RUN at min height out to the tip.
 tab_len = 11;         // x, how far each sticks out
@@ -114,15 +119,27 @@ greeble_y = (tabp_y + tab_w + shroud_y0 + shroud_w) / 2;  // cordB_y mirrored
 greeble_z = shroud_h_tip - 4.8 - cord_d / 2;              // = cordB_z
 
 module brick() {
-    // body: rounded vertical edges, 45° chamfer around the top face only
-    intersection() {
-        linear_extrude(brick_h)
-            offset(r = brick_corner_r) offset(delta = -brick_corner_r)
-                square([brick_l, brick_w]);
-        translate([0, brick_w, 0]) rotate([90, 0, 0])
-            linear_extrude(brick_w) polygon(_prof(brick_l, brick_h, brick_chamfer, false));
-        rotate([90, 0, 90])
-            linear_extrude(brick_l) polygon(_prof(brick_w, brick_h, brick_chamfer, false));
+    // body: rounded vertical edges, 45° chamfer around the top face only,
+    // shell parting-line groove at the z-center plane
+    difference() {
+        intersection() {
+            linear_extrude(brick_h)
+                offset(r = brick_corner_r) offset(delta = -brick_corner_r)
+                    square([brick_l, brick_w]);
+            translate([0, brick_w, 0]) rotate([90, 0, 0])
+                linear_extrude(brick_w) polygon(_prof(brick_l, brick_h, brick_chamfer, false));
+            rotate([90, 0, 90])
+                linear_extrude(brick_l) polygon(_prof(brick_w, brick_h, brick_chamfer, false));
+        }
+        translate([0, 0, brick_h / 2 - seam_h / 2])
+            linear_extrude(seam_h) difference() {
+                offset(delta = 1)  // overshoot outward to dodge coplanar faces
+                    offset(r = brick_corner_r) offset(delta = -brick_corner_r)
+                        square([brick_l, brick_w]);
+                offset(delta = -seam_d)
+                    offset(r = brick_corner_r) offset(delta = -brick_corner_r)
+                        square([brick_l, brick_w]);
+            }
     }
     // Tab profiles overshoot the plan footprint by 0.5 on both x ends so the
     // rounded _tab_plan governs the tip cleanly (avoids coincident-face CGAL
