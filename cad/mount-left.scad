@@ -100,7 +100,7 @@ bay_x0 = bay_x1 - bay_w;
 // rides to 2 from the panel FRONT face — its slot pockets into the panel's
 // back, leaving a 2 web — which keeps the front wall thin.
 tab_tip_z = 2;
-body_z0 = tab_tip_z + tab_len;     // brick body front face
+body_z0 = tab_tip_z + tabm_len;    // brick body front face
 body_z1 = body_z0 + brick_l;
 wall_z1 = body_z1;                 // walls + eaves stop at the body rear face
 shelf_z1 = body_z1 + 12;           // shelf runs on under the shroud root
@@ -111,17 +111,20 @@ wall_top = min(brick_top + 4, panel_h);   // low walls; capped at the panel
 
 // ---- retention ----
 // Side eaves over the brick's 6 mm top-perimeter chamfer: same 45°-parallel
-// underside and tuning knob as the right piece.
+// underside and tuning knob as the right piece. The drafted sides put the
+// chamfer edge (brick_w_top) inboard of the max envelope — the eave drops
+// by that inset to keep the same engagement.
 eave_depth = 3;
 eave_squeeze = -0.1;    // +interference / -clearance against the chamfer face
-eave_y = brick_top - brick_chamfer - clr - eave_squeeze;
+eave_y = brick_top - brick_chamfer - clr - eave_squeeze
+         - (brick_w - brick_w_top) / 2;
 
-// The front wall doubles as the tab seat: the -x wall-box tab passes through
-// a slot to 1 mm short of the panel, and a bar over the tab's 4 mm flat tip
-// holds the nose down (redundant with the eaves, but free).
+// The front wall doubles as the tab seat: the -x wall-box tab (the big
+// offset one) passes through a slot to 2 short of the panel front, and a
+// bar over the tab's 4 mm flat tip holds the nose down.
 slot_fit = 0.5;                        // per side around the tab
-tab_slot_x0 = bay_x0 + clr + (brick_w - tab_w) / 2 - slot_fit;
-tab_slot_w = tab_w + 2 * slot_fit;
+tab_slot_x0 = bay_x0 + clr + tabm_y - slot_fit;
+tab_slot_w = tabm_w + 2 * slot_fit;
 bar_z1 = tab_tip_z + tabm_flat;        // bar covers the flat run at the tip
 bar_y = shelf_top + tabm_h_min + 0.5;  // bar underside just over the flat tip
 slot_y1 = shelf_top + tabm_h_max + 1.5;

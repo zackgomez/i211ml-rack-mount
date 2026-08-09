@@ -80,10 +80,15 @@ module ont() {
 // 124 x 88 are max-envelope caliper numbers, so pockets sized off these are
 // safe; the body is just a touch slimmer near top and bottom.
 brick_l = 124;        // x
-brick_w = 88;         // y
+brick_w = 85;         // y, max envelope — at the mid-height shell seam
+brick_w_bot = 83.4;   // y at the bottom face (calipers 2026-08-09)
+brick_w_top = 83.4;   // y at the chamfer edge — assumed = bottom via a
+                      // symmetric draft (TODO calipers)
 brick_h = 44;         // z
 brick_chamfer = 6;    // top-face perimeter only
 brick_corner_r = 2.5; // vertical edges "lightly rounded" — eyeball value
+byi = (brick_w - brick_w_bot) / 2;   // bottom inset per side
+tyi = (brick_w - brick_w_top) / 2;   // chamfer-edge inset per side
 
 // shell parting line: groove around the body at the z-center plane where the
 // two plastic shell halves mate
@@ -91,22 +96,28 @@ seam_h = 1;           // z height of the groove
 seam_d = 1;           // how deep it cuts into the x/y faces
 
 // Mounting tabs on BOTH x ends: bottom-flush wedges, thick at the body,
-// sloping down to a FLAT RUN at min height out to the tip.
-tab_len = 11;         // x, how far each sticks out
-tab_w = 12.5;         // y
+// sloping down to a FLAT RUN at min height out to the tip. The two tabs
+// differ in plan AND position (calipers 2026-08-09): the -x body tab is
+// the big one, offset toward -y (24.4 off the bottom face's -y edge, and
+// 24.4 + 20.3 + 38.7 closes the 83.4 bottom width exactly); the +x tab
+// on the shroud tip is the small centered one.
+tabm_len = 18.2;  tabm_w = 20.3;                       // -x tab plan
+tabm_y = byi + 24.4;                                   // its -y edge, bbox frame
+tabm_h_min = 3.8;  tabm_h_max = 8.2;  tabm_flat = 4;   // -x tab wedge
+tab_len = 11;         // +x tab, x
+tab_w = 12.5;         // +x tab, y
 tab_r = 2.5;          // outer vertical edges "moderately rounded" — eyeball
-tabm_h_min = 3.8;  tabm_h_max = 8.2;  tabm_flat = 4;   // -x tab
-tabp_h_min = 3.3;  tabp_h_max = 7.0;  tabp_flat = 3;   // +x tab
+tabp_h_min = 3.3;  tabp_h_max = 7.0;  tabp_flat = 3;   // +x tab wedge
 
-// plan footprint of a tab, tip corners rounded; tip at x=0, or at x=tab_len
+// plan footprint of a tab, tip corners rounded; tip at x=0, or at x=len
 // with tip_right=true (built directly, not mirror()ed — mirrored 2D reverses
 // winding and CGAL rejects the extruded intersection as non-closed)
-module _tab_plan(tip_right = false) {
-    cx = tip_right ? tab_len - tab_r : tab_r;
+module _tab_plan(len, w, tip_right = false) {
+    cx = tip_right ? len - tab_r : tab_r;
     hull() {
-        translate([tip_right ? 0 : tab_len - 1, 0]) square([1, tab_w]);
+        translate([tip_right ? 0 : len - 1, 0]) square([1, w]);
         translate([cx, tab_r]) circle(tab_r, $fn = 32);
-        translate([cx, tab_w - tab_r]) circle(tab_r, $fn = 32);
+        translate([cx, w - tab_r]) circle(tab_r, $fn = 32);
     }
 }
 
@@ -166,8 +177,15 @@ module brick() {
                     square([brick_l, brick_w]);
             translate([0, brick_w, 0]) rotate([90, 0, 0])
                 linear_extrude(brick_w) polygon(_prof(brick_l, brick_h, brick_chamfer, false));
-            rotate([90, 0, 90])
-                linear_extrude(brick_l) polygon(_prof(brick_w, brick_h, brick_chamfer, false));
+            // width profile: drafted sides — 83.4 at the bottom, widest (85)
+            // at the mid-height seam, back in at the chamfer edge, 45° top
+            // chamfer from there
+            rotate([90, 0, 90]) linear_extrude(brick_l) polygon([
+                [byi, 0], [brick_w - byi, 0], [brick_w, brick_h / 2],
+                [brick_w - tyi, brick_h - brick_chamfer],
+                [brick_w - tyi - brick_chamfer, brick_h],
+                [tyi + brick_chamfer, brick_h],
+                [tyi, brick_h - brick_chamfer], [0, brick_h / 2]]);
         }
         // convexity hint stops the F5 see-through artifact on this groove
         translate([0, 0, brick_h / 2 - seam_h / 2])
@@ -184,12 +202,13 @@ module brick() {
     // rounded _tab_plan governs the tip cleanly (avoids coincident-face CGAL
     // errors); the body-side overshoot is swallowed by the union.
     // -x tab: x=0 at tip; flat run at h_min from the tip, then slope up to
-    // h_max at the body
-    translate([-tab_len, (brick_w - tab_w) / 2, 0]) intersection() {
-        translate([0, tab_w, 0]) rotate([90, 0, 0]) linear_extrude(tab_w)
-            polygon([[-0.5, 0], [tab_len + 0.5, 0], [tab_len + 0.5, tabm_h_max],
+    // h_max at the body. Offset toward -y, not centered.
+    translate([-tabm_len, tabm_y, 0]) intersection() {
+        translate([0, tabm_w, 0]) rotate([90, 0, 0]) linear_extrude(tabm_w)
+            polygon([[-0.5, 0], [tabm_len + 0.5, 0], [tabm_len + 0.5, tabm_h_max],
                      [tabm_flat, tabm_h_min], [-0.5, tabm_h_min]]);
-        translate([0, 0, -0.5]) linear_extrude(tabm_h_max + 1.5) _tab_plan();
+        translate([0, 0, -0.5]) linear_extrude(tabm_h_max + 1.5)
+            _tab_plan(tabm_len, tabm_w);
     }
     // +x tab: hangs off the far end of the cord shroud. x=0 at the tip face;
     // slope down from h_max to a flat run at h_min ending at the tip
@@ -198,7 +217,7 @@ module brick() {
             polygon([[-0.5, 0], [tab_len + 0.5, 0], [tab_len + 0.5, tabp_h_min],
                      [tab_len - tabp_flat, tabp_h_min], [-0.5, tabp_h_max]]);
         translate([0, 0, -0.5]) linear_extrude(tabp_h_max + 1.5)
-            _tab_plan(tip_right = true);
+            _tab_plan(tab_len, tab_w, tip_right = true);
     }
     // cord shroud: flush with the bottom, 6 mm off the -y edge. Side profile
     // traced 2026-08-08: flat top at root height, knee curving down to the

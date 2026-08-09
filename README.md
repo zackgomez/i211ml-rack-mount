@@ -28,17 +28,20 @@ The Alcatel manual claims 249 × 159 × 38 — trust the tape+calipers numbers b
   UNPLUG" collar), max draw 10.5 W — heat is a non-issue, token venting suffices
 
 **Power brick — Verizon "Power OK" inline PSU**
-- Body 124 (x) × 88 (y) × 44 mm (z) — all *calipers*, max envelope
+- Body 124 (x) × 85 (y, max) × 44 mm (z) — *calipers*. The y sides are
+  drafted, widest at the mid-height shell seam: 83.4 at the bottom face,
+  85.0 at the seam, back in toward the chamfer edge (assumed 83.4 via a
+  symmetric draft — TODO calipers)
 - 6 mm chamfer around the top-face perimeter; vertical edges lightly rounded
   (~r2.5, eyeball); bottom face edges sharp
-- Sides bow slightly ("diamond"): widest point ~1.2 mm proud of the chamfer
-  edge at mid-height (rough) — 124 × 88 already capture the max
-- Mounting tabs (wall-box rail hooks), 11 x × 12.5 y each (*calipers*),
-  bottom-flush, outer vertical corners moderately rounded (~r2.5). Wedge
-  profile: max height at the root, sloping down to a flat run at min height
-  ending at the tip:
-  - on the body's −x end: 3.8 → 8.2 mm, 4 mm flat
-  - on the far (+x) END of the cord hump: 3.3 → 7.0 mm, 3 mm flat
+- Mounting tabs (wall-box rail hooks), bottom-flush, outer vertical corners
+  moderately rounded (~r2.5). Wedge profile: max height at the root, sloping
+  down to a flat run at min height ending at the tip:
+  - body −x end (*calipers*): 18.2 x × 20.3 y, NOT centered — 24.4 off the
+    bottom face's −y edge (24.4 + 20.3 + 38.7 closes the 83.4 bottom width
+    exactly); wedge 3.8 → 8.2 mm, 4 mm flat
+  - far (+x) END of the cord hump: 11 x × 12.5 y, centered on the shroud;
+    wedge 3.3 → 7.0 mm, 3 mm flat
 - Cord shroud on the +x end (strain relief locking the output cord): 38 beyond
   the body in x, 53 wide in y, bottom-flush, 6 mm margin (*calipers*) off the
   widest −y edge. Side profile: flat top 14 below the brick top (tape), knee
@@ -177,9 +180,13 @@ the right piece at 1U) all re-derive.
 2. Reprint right half, verify eave feel + foot pads
 3. Joint hardware pass on the right piece (left carries 10-thick flange +
    nut pockets; right may want matching meat at `mate_z1`)
-4. Test-print left half: eave feel, tab slot fit, nut pocket press,
-   keystone snap
-5. Material-saving cutout pass, right-half 2U flip, final prints
+4. Left half test print v1 done (2026-08-09): keystone perfect, rack +
+   joint hardware fit well; brick model corrected after (real −x tab +
+   drafted width) — reprint to confirm bay/tab/eave fit
+5. Material-saving pass: hollow the cage walls (with rounded interior
+   corners), consider thinner cage walls (coordinate with the right
+   piece), reduce the front tab-seat wall to posts. Then 1U-vs-2U call
+   and final prints
 6. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
 
 ## references/
