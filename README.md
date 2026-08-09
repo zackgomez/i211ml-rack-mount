@@ -137,7 +137,9 @@ and clears this rack's posts; `ear_clear`). The floor plane spans only
 the cage. The brick slides in from the rear: side eaves grab the 6 mm
 top-perimeter chamfer (same `eave_squeeze` knob, −0.1), a front brow
 grabs the front-top chamfer, and the −x tab passes through a slot in the
-front wall with a hold-down bar riding 0.5 over its flat tip. Two
+front wall — its tip rides to 2 from the panel FRONT face (the slot
+pockets into the panel's back, keeping the front wall thin) — with a
+hold-down bar riding 0.5 over its flat tip. Two
 zip-tie slots behind the body anchor the AC cord so tugs land on the
 mount, not the brick. Joint flange is 10 thick: M5 holes match mount.scad
 (y = panel_h/2, z 20/48); hex nut pockets 8.2 across flats (UCG pockets
@@ -146,7 +148,8 @@ M5×16 tip lands flush. Two UCG-style gusset ramps brace the flange, one
 near each panel edge and inset 6 in y — full 64 depth at the flange, free
 edge a concave quarter-circle fillet running out to the panel at x=70.
 Rounded corners: panel outer corners r4 (sized to keep the ear-slot web),
-cage top-rear r8 across walls + eaves, flange rear corners r6 (tangent to
+cage top-rear r8 across walls + eaves, cage outer edges r2 (wall
+top-outer along z, rear verticals), flange rear corners r6 (tangent to
 the ramps), shelf rear r6, keystone boss r3. Keystone slot at x = 52
 (joint side), y = panel_h/2, latch
 up, jack in from the rear: geometry is the coupon-validated recipe from

@@ -64,6 +64,8 @@ ramp_inset = 6;
 panel_r = 4;            // panel's outer corners (small enough to keep the
                         // web at the ear slots' outer ends)
 cage_r = 8;             // cage top-rear corner, across walls + eaves
+cage_er = 2;            // cage outer edges: wall top-outer (along z) and
+                        // rear vertical (along y)
 flange_r = 6;           // flange rear corners (= ramp_inset, so the cuts
                         // land tangent to the ramps)
 shelf_r = 6;            // shelf rear corners
@@ -85,10 +87,11 @@ cage_x1 = piece_w - ear_clear;
 bay_x1 = cage_x1 - wall;
 bay_x0 = bay_x1 - bay_w;
 
-// depth chain: panel, front wall (tab seat), body, open rear
-tab_clr = 1;                       // gap from panel rear face to the tab tip
-front_t = tab_len + tab_clr;       // front wall thickness in z
-body_z0 = panel_t + front_t;       // brick body front face
+// depth chain: panel, front wall (tab seat), body, open rear. The tab tip
+// rides to 2 from the panel FRONT face — its slot pockets into the panel's
+// back, leaving a 2 web — which keeps the front wall thin.
+tab_tip_z = 2;
+body_z0 = tab_tip_z + tab_len;     // brick body front face
 body_z1 = body_z0 + brick_l;
 wall_z1 = body_z1;                 // walls + eaves stop at the body rear face
 shelf_z1 = body_z1 + 12;           // shelf runs on under the shroud root
@@ -109,7 +112,7 @@ eave_y = brick_top - brick_chamfer - clr - eave_squeeze;
 slot_fit = 0.5;                        // per side around the tab
 tab_slot_x0 = bay_x0 + clr + (brick_w - tab_w) / 2 - slot_fit;
 tab_slot_w = tab_w + 2 * slot_fit;
-bar_z1 = panel_t + 4;                  // bar depth = the flat run at the tip
+bar_z1 = tab_tip_z + tabm_flat;        // bar covers the flat run at the tip
 bar_y = shelf_top + tabm_h_min + 0.5;  // bar underside just over the flat tip
 slot_y1 = shelf_top + tabm_h_max + 1.5;
 
@@ -245,10 +248,11 @@ module mount_left() {
                 polygon([[bay_x1, eave_y], [bay_x1 - eave_depth, eave_y + eave_depth],
                          [bay_x1 - eave_depth, wall_top], [bay_x1, wall_top]]);
         }
-        // tab slot through the front wall: tip channel under the bar, then
-        // full-height clearance for the wedge
-        translate([tab_slot_x0, shelf_top, panel_t])
-            cube([tab_slot_w, bar_y - shelf_top, bar_z1 - panel_t]);
+        // tab slot through the front wall: tip channel under the bar (its
+        // first 2 pocketing into the panel back), then full-height
+        // clearance for the wedge
+        translate([tab_slot_x0, shelf_top, tab_tip_z])
+            cube([tab_slot_w, bar_y - shelf_top, bar_z1 - tab_tip_z]);
         translate([tab_slot_x0, shelf_top, bar_z1])
             cube([tab_slot_w, slot_y1 - shelf_top, body_z0 - bar_z1 + 1]);
         // keystone slot
@@ -263,8 +267,8 @@ module mount_left() {
             translate([flange_t - nut_pocket_t, panel_h / 2, z]) rotate([0, 90, 0])
                 cylinder(h = nut_pocket_t + 0.01, d = nut_af / cos(30), $fn = 6);
         }
-        // shelf vents
-        hex_holes(bay_x0 + 8, bay_x1 - 8, body_z0 + 8, body_z1 - 8);
+        // shelf vents (6 side margin squeezes in a fifth hex column)
+        hex_holes(bay_x0 + 6, bay_x1 - 6, body_z0 + 8, body_z1 - 8);
         // zip-tie slots
         for (x = zip_x)
             translate([x - zip_slot[0] / 2, shelf_y0 - 1, zip_z0])
@@ -276,6 +280,24 @@ module mount_left() {
             translate([bay_x0 - wall - 2, wall_top - cage_r, wall_z1 - cage_r])
                 rotate([0, 90, 0])
                     cylinder(h = cage_x1 - bay_x0 + wall + 4, r = cage_r, $fn = 48);
+        }
+        // round the cage's outer edges: the walls' top-outer edges (along z,
+        // starting behind the panel) and rear vertical edges (above the shelf)
+        for (p = [[bay_x0 - wall, 1], [cage_x1, -1]]) {
+            xc = p[0] + p[1] * cage_er;         // cylinder center x
+            xb = p[1] > 0 ? p[0] - 1 : p[0] - cage_er;   // cutter block x0
+            difference() {
+                translate([xb, wall_top - cage_er, panel_t])
+                    cube([cage_er + 1, cage_er + 1, wall_z1 - panel_t + 1]);
+                translate([xc, wall_top - cage_er, panel_t - 0.5])
+                    cylinder(h = wall_z1 - panel_t + 2, r = cage_er, $fn = 24);
+            }
+            difference() {
+                translate([xb, shelf_top, wall_z1 - cage_er])
+                    cube([cage_er + 1, wall_top - shelf_top + 1, cage_er + 1]);
+                translate([xc, shelf_top - 0.5, wall_z1 - cage_er]) rotate([-90, 0, 0])
+                    cylinder(h = wall_top - shelf_top + 2, r = cage_er, $fn = 24);
+            }
         }
         // round the flange's rear corners (tangent to the inset ramps)
         difference() {
