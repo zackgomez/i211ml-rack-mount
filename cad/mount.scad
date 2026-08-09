@@ -38,7 +38,13 @@ mate_hole_d = 5.3;      // M5 joint screws through the mating flange
 // ---- cage ----
 clr = 1.5;              // pocket clearance per side — confirmed by test print
 wall = 4;
-mate_wall_t = 6;                     // joint flange doubles as inner cage wall
+mate_wall_t = 8;                     // joint flange doubles as inner cage wall.
+                                     // Mates mount-left's 10-thick flange
+                                     // (4 web + 6 hex pocket, M5 nut AF 8.4):
+                                     // M5x16 through 8+10 ends at the nut's
+                                     // far face. Holes y=panel_h/2, z 20/48
+                                     // on both pieces — aligns once both run
+                                     // panel_u=2
 bay_x0 = mate_wall_t;
 bay_w = ont_l + 2 * clr;
 bay_x1 = bay_x0 + bay_w;
