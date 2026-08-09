@@ -16,10 +16,14 @@ The Alcatel manual claims 249 × 159 × 38 — trust the tape+calipers numbers b
 - 227 (x, tape) × 148 (y, *calipers*) × 33 mm (z, *calipers*)
 - 45° chamfer on ALL edges, face width 10.5 mm (*calipers*) → ~7.4 mm legs;
   the LED bevel is one of them
-- 4 rubber feet on the bottom, Ø11 × 3 tall (*calipers*): LED-side pair 1.5
-  from the x edges, port-side pair 20 from the x edges; center inset from the
-  LED/port edges est. 8 (TODO calipers). Also unmeasured mounting bosses,
-  shorter than the feet — the cage floats the ONT on its feet so bosses hover
+- 4 rubber feet on the bottom, Ø11 × 3 tall (*calipers*): gaps measured from
+  the chamfer edge, applying on both axes from each corner — LED-side pair
+  1.5, port-side pair 20 (centers 14.4 / 32.9 from their corners). Also
+  unmeasured mounting bosses, shorter than the feet — the cage floats the
+  ONT on its feet so bosses hover
+- Rear-face ports, z-centered on the connector face (*calipers*): coax F
+  center 36 from the −x face; green SC/APC fiber plug outer edge 20 from the
+  +x face (so the fiber lives near the outer wall's rear exit gap)
 - Power input: 12 VDC / 2.5 A, keyed circular connector ("TELECOM EQUIPMENT DO NOT
   UNPLUG" collar), max draw 10.5 W — heat is a non-issue, token venting suffices
 

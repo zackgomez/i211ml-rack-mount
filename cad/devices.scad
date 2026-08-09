@@ -51,11 +51,27 @@ ont_feet = [
     [ont_l - f_port, f_port],
 ];
 
+// Rear-face ports, centered in z on the connector face (y=0). Positions
+// calipers; stub sizes estimated. Modeled as protruding stubs so mount
+// keep-outs and cable sweep are visible on the ghost.
+coax_x = 36;                 // F-connector center to the -x face
+coax_d = 9.5;
+coax_len = 12;
+fiber_edge_x = ont_l - 20;   // green SC/APC plug outer edge to the +x face
+fiber_w = 9.4;
+fiber_h = 9;
+fiber_len = 30;              // connector body + start of boot
+
 module ont() {
     chamfered_box(ont_l, ont_w, ont_h, ont_chamfer);
     for (p = ont_feet)
         translate([p[0], p[1], -foot_h])
             cylinder(h = foot_h + 0.5, d = foot_d, $fn = 24);
+    // port stubs on the connector face
+    translate([coax_x, 0.5, ont_h / 2]) rotate([90, 0, 0])
+        cylinder(h = coax_len + 0.5, d = coax_d, $fn = 24);
+    translate([fiber_edge_x - fiber_w, -fiber_len, (ont_h - fiber_h) / 2])
+        cube([fiber_w, fiber_len + 0.5, fiber_h]);
 }
 
 // ---------------- Power brick ----------------
