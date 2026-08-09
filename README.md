@@ -108,6 +108,16 @@ All gauges carry 0.5 mm/side clearance (`clear` in gauges.scad). Print flat face
 down, no supports. Re-export:
 `openscad -D 'part="ont_cap"' -o stl/gauge-ont-cap.stl gauges.scad`
 
+Mount STL + preview regeneration (from `cad/`):
+
+```
+openscad --export-format=asciistl -o stl/mount-left-2u.stl mount-left.scad
+openscad --export-format=asciistl -D 'panel_u=1' -o stl/mount-left-1u.stl mount-left.scad
+openscad -o mount-left-preview.png --imgsize=1600,1100 --viewall --autocenter \
+    --camera=0,0,0,65,0,150,0 mount-left.scad   # -preview-rear.png: rz 150->30;
+                                                # 1U: add -D 'panel_u=1'
+```
+
 **ASA shrink protocol**: print gauges at 100%, in ASA, same profile as the final
 mount. Fit = measurement + shrink verified together; snug/no-go = measure the gap
 and adjust `clear` / final pocket clearances. Target for device bays in the real
@@ -160,7 +170,15 @@ no tuned lip; the teeth wedge against tapered clamp faces (hook side
 6.35→12.15 over 4.9 deep, latch side 45° 10.15→12.15), 24.3 × 15.0
 cavity, and a rear plate whose 19.8 window guides the jack — cut into a
 9.5-thick boss on the panel rear. Rack ear ovals 14 × 7 (UCG-style
-horizontal play). Walls stop 4 above the brick.
+horizontal play). Low eave-derived ceiling: walls and eaves stop 3 past
+the eave slope (the brick's chamfered top stands ~2 proud; the brow's
+45° underside runs exactly to the wall top). Material pass: each side
+wall carries two elongated-hex windows (45° pointed ends print
+bridge-free, corners r4, 8 rib between, rails tied to the
+shelf/eave/brick-face/rear-round lines); the front wall is a windowed
+frame — two through-pockets behind the panel flank the tab housing,
+keeping the full-perimeter brick stop, the slot's keying walls +
+hold-down bar, and the brow foundation.
 
 A 1U variant exists (`panel_u = 1` → `stl/mount-left-1u.stl`): the
 44-tall brick beats the 43.65 panel only by poaching inter-U slack. It
@@ -183,10 +201,12 @@ the right piece at 1U) all re-derive.
 4. Left half test print v1 done (2026-08-09): keystone perfect, rack +
    joint hardware fit well; brick model corrected after (real −x tab +
    drafted width) — reprint to confirm bay/tab/eave fit
-5. Material-saving pass: hollow the cage walls (with rounded interior
-   corners), consider thinner cage walls (coordinate with the right
-   piece), reduce the front tab-seat wall to posts. Then 1U-vs-2U call
-   and final prints
+5. Material pass — left half done (hollowed side walls, windowed front
+   wall, low ceiling; −39 cm³ per variant). Remaining: the
+   primary-thickness discussion (`wall`/`panel_t`/`shelf_t` are shared
+   design language, cross-piece), the same hollowing for the ONT cage
+   (mount.scad), and the right piece's low-ceiling proposal. Then
+   1U-vs-2U call and final prints
 6. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
 
 ## references/

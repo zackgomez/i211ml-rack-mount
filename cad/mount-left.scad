@@ -137,6 +137,26 @@ slot_y1 = shelf_top + tabm_h_max + 1.5;
 // tied to the wall top: the brow's 45° underside ends where the wall does.
 brow_z1 = body_z0 + (wall_top - eave_y);
 
+// ---- wall hollowing ----
+// The side walls' free spans (between shelf, eave zone, front wall, and
+// rear edge) carry no load worth 4 mm of solid — cut windows. Elongated
+// hexagons: the 45° ends grow and close printably in the walls' per-layer
+// cross-section (no flat bridges — just a ~6 chord at each rounded tip)
+// and echo the shelf's hex vents. One rib splits each wall's span.
+win_r = 4;                  // corner rounding, all cutout edges
+win_y0 = shelf_top + 4;     // rail above the shelf junction
+win_y1 = eave_y - 3;        // rail below the eave slope
+swin_z0 = body_z0;          // window tips align with the brick's front face
+swin_z1 = wall_z1 - 8;      // rear rail, sized with the r8 corner round
+swin_rib = 8;
+swin_w = (swin_z1 - swin_z0 - swin_rib) / 2;
+// The front wall keeps its full-perimeter frame (its rear face is still
+// the brick's forward stop all the way around), the tab slot's keying
+// walls + hold-down bar, and the brow's foundation — two through-pockets
+// behind the panel flank the tab housing: a wall with big windows.
+fwin_x = [[bay_x0 + 6, tab_slot_x0 - 4],
+          [tab_slot_x0 + tab_slot_w + 4, bay_x1 - 6]];
+
 // ---- keystone ----
 // RJ45 handoff: patch cable from the ONT's rear GigE port to a keystone
 // jack, joint side of the panel, face to the rack front, latch side DOWN.
@@ -283,6 +303,27 @@ module mount_left() {
         for (x = zip_x)
             translate([x - zip_slot[0] / 2, shelf_y0 - 1, zip_z0])
                 cube([zip_slot[0], shelf_t + 2, zip_slot[1]]);
+        // side-wall windows — one prism cuts both walls (the bay between
+        // is air; eaves and brow sit above win_y1, the front wall forward
+        // of swin_z0)
+        for (i = [0, 1]) {
+            z0 = swin_z0 + i * (swin_w + swin_rib);
+            hh = (win_y1 - win_y0) / 2;
+            translate([bay_x0 - wall - 1, 0, 0]) rotate([90, 0, 90])
+                linear_extrude(cage_x1 - bay_x0 + wall + 2)
+                    offset(r = win_r) offset(delta = -win_r) polygon([
+                        [win_y0 + hh, z0],
+                        [win_y1, z0 + hh], [win_y1, z0 + swin_w - hh],
+                        [win_y0 + hh, z0 + swin_w],
+                        [win_y0, z0 + swin_w - hh], [win_y0, z0 + hh]]);
+        }
+        // front-wall windows: straight through-pockets (every face runs
+        // along z — nothing reappears over them; the panel stays closed)
+        for (xr = fwin_x)
+            translate([0, 0, panel_t]) linear_extrude(body_z0 - panel_t + 1)
+                offset(r = win_r) offset(delta = -win_r)
+                    translate([xr[0], win_y0])
+                        square([xr[1] - xr[0], win_y1 - win_y0]);
         // round the cage's top-rear corner, across walls + eaves in one cut
         difference() {
             translate([bay_x0 - wall - 1, wall_top - cage_r, wall_z1 - cage_r])
