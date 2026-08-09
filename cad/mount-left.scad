@@ -52,12 +52,22 @@ nut_af = 8.2;           // M5 nut is 8.0 across flats; the UCG mount's pockets
 nut_pocket_t = 6;       // pocket depth; the 4-thick web puts an M5x16 tip
                         // flush with the flange's inner face
 
-// Joint ramps: UCG-style triangular gussets bracing the flange to the
-// panel, one near each panel edge, inset in y — full flange depth at the
-// flange, 45° taper down the panel.
+// Joint ramps: UCG-style gussets bracing the flange to the panel, one near
+// each panel edge, inset in y. Full flange depth at the flange; the free
+// edge is a concave quarter-circle fillet running out to the panel — a
+// little over half the plastic of the straight-hypotenuse triangle.
 ramp_t = 6;
 ramp_x1 = 70;
 ramp_inset = 6;
+
+// corner-rounding pass
+panel_r = 4;            // panel's outer corners (small enough to keep the
+                        // web at the ear slots' outer ends)
+cage_r = 8;             // cage top-rear corner, across walls + eaves
+flange_r = 6;           // flange rear corners (= ramp_inset, so the cuts
+                        // land tangent to the ramps)
+shelf_r = 6;            // shelf rear corners
+boss_r = 3;             // keystone boss
 
 // ---- cage ----
 clr = 1.5;              // pocket clearance per side (matches right piece)
@@ -194,16 +204,30 @@ module rack_slot() {
 module mount_left() {
     difference() {
         union() {
-            cube([piece_w, panel_h, panel_t]);                   // panel
+            linear_extrude(panel_t) hull() {                     // panel, outer
+                square([piece_w - panel_r, panel_h]);            // corners round
+                for (y = [panel_r, panel_h - panel_r])
+                    translate([piece_w - panel_r, y]) circle(panel_r, $fn = 48);
+            }
             cube([flange_t, panel_h, flange_z1]);                // joint flange
             for (y1 = [ramp_inset + ramp_t, panel_h - ramp_inset])  // joint ramps
                 translate([0, y1, 0]) rotate([90, 0, 0])
-                    linear_extrude(ramp_t) polygon([[0, 0], [0, flange_z1],
-                        [flange_t, flange_z1], [ramp_x1, panel_t], [ramp_x1, 0]]);
+                    linear_extrude(ramp_t) polygon(concat(
+                        [[0, 0], [0, flange_z1]],
+                        [for (a = [0 : 5 : 90])                  // concave fillet
+                            [ramp_x1 - (ramp_x1 - flange_t) * cos(a),
+                             flange_z1 - (flange_z1 - panel_t) * sin(a)]],
+                        [[ramp_x1, 0]]));
             translate([key_x - key_boss[0] / 2, key_y - key_boss[1] / 2, 0])
-                cube([key_boss[0], key_boss[1], key_wall]);      // keystone boss
-            translate([bay_x0 - wall, shelf_y0, 0])              // shelf, cage only
-                cube([cage_x1 - bay_x0 + wall, shelf_t, shelf_z1]);
+                linear_extrude(key_wall)                         // keystone boss
+                    offset(r = boss_r) offset(delta = -boss_r) square(key_boss);
+            translate([bay_x0 - wall, shelf_top, 0])             // shelf, cage
+                rotate([90, 0, 0]) linear_extrude(shelf_t) hull() {  // only, rear
+                    sw = cage_x1 - bay_x0 + wall;                // corners round
+                    square([sw, shelf_z1 - shelf_r]);
+                    for (x = [shelf_r, sw - shelf_r])
+                        translate([x, shelf_z1 - shelf_r]) circle(shelf_r, $fn = 32);
+                }
             translate([bay_x0 - wall, shelf_y0, 0])              // inner wall
                 cube([wall, wall_top - shelf_y0, wall_z1]);
             translate([bay_x1, shelf_y0, 0])                     // outer wall
@@ -213,6 +237,13 @@ module mount_left() {
                 polygon([[shelf_y0, 0], [shelf_y0, body_z0],
                          [eave_y, body_z0], [eave_y + brow_z1 - body_z0, brow_z1],
                          [wall_top, brow_z1], [wall_top, 0]]);
+            // side eaves (they intentionally reach into the bay)
+            translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
+                polygon([[bay_x0, eave_y], [bay_x0 + eave_depth, eave_y + eave_depth],
+                         [bay_x0 + eave_depth, wall_top], [bay_x0, wall_top]]);
+            translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
+                polygon([[bay_x1, eave_y], [bay_x1 - eave_depth, eave_y + eave_depth],
+                         [bay_x1 - eave_depth, wall_top], [bay_x1, wall_top]]);
         }
         // tab slot through the front wall: tip channel under the bar, then
         // full-height clearance for the wedge
@@ -238,14 +269,28 @@ module mount_left() {
         for (x = zip_x)
             translate([x - zip_slot[0] / 2, shelf_y0 - 1, zip_z0])
                 cube([zip_slot[0], shelf_t + 2, zip_slot[1]]);
+        // round the cage's top-rear corner, across walls + eaves in one cut
+        difference() {
+            translate([bay_x0 - wall - 1, wall_top - cage_r, wall_z1 - cage_r])
+                cube([cage_x1 - bay_x0 + wall + 2, cage_r + 1, cage_r + 1]);
+            translate([bay_x0 - wall - 2, wall_top - cage_r, wall_z1 - cage_r])
+                rotate([0, 90, 0])
+                    cylinder(h = cage_x1 - bay_x0 + wall + 4, r = cage_r, $fn = 48);
+        }
+        // round the flange's rear corners (tangent to the inset ramps)
+        difference() {
+            translate([-1, panel_h - flange_r, flange_z1 - flange_r])
+                cube([flange_t + 2, flange_r + 1, flange_r + 1]);
+            translate([-2, panel_h - flange_r, flange_z1 - flange_r])
+                rotate([0, 90, 0]) cylinder(h = flange_t + 4, r = flange_r, $fn = 48);
+        }
+        difference() {
+            translate([-1, -1, flange_z1 - flange_r])
+                cube([flange_t + 2, flange_r + 1, flange_r + 1]);
+            translate([-2, flange_r, flange_z1 - flange_r])
+                rotate([0, 90, 0]) cylinder(h = flange_t + 4, r = flange_r, $fn = 48);
+        }
     }
-    // side eaves (added after the cuts — they intentionally reach into the bay)
-    translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
-        polygon([[bay_x0, eave_y], [bay_x0 + eave_depth, eave_y + eave_depth],
-                 [bay_x0 + eave_depth, wall_top], [bay_x0, wall_top]]);
-    translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
-        polygon([[bay_x1, eave_y], [bay_x1 - eave_depth, eave_y + eave_depth],
-                 [bay_x1 - eave_depth, wall_top], [bay_x1, wall_top]]);
 }
 
 module assembly() {

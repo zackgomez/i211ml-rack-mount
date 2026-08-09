@@ -143,8 +143,12 @@ mount, not the brick. Joint flange is 10 thick: M5 holes match mount.scad
 (y = panel_h/2, z 20/48); hex nut pockets 8.2 across flats (UCG pockets
 measure ~8.1 and press-fit on this printer), 6 deep over a 4 web — an
 M5×16 tip lands flush. Two UCG-style gusset ramps brace the flange, one
-near each panel edge and inset 6 in y, full 64 depth tapering 45° to the
-panel by x=70. Keystone slot at x = 52 (joint side), y = panel_h/2, latch
+near each panel edge and inset 6 in y — full 64 depth at the flange, free
+edge a concave quarter-circle fillet running out to the panel at x=70.
+Rounded corners: panel outer corners r4 (sized to keep the ear-slot web),
+cage top-rear r8 across walls + eaves, flange rear corners r6 (tangent to
+the ramps), shelf rear r6, keystone boss r3. Keystone slot at x = 52
+(joint side), y = panel_h/2, latch
 up, jack in from the rear: geometry is the coupon-validated recipe from
 `../voron-keystone-panel` (opening 19.50 × 15.05, lip 1.30, recesses +
 cam ramp) cut into a 7-thick boss on the panel rear. Rack ear ovals
