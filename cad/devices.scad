@@ -82,8 +82,8 @@ module ont() {
 brick_l = 124;        // x
 brick_w = 85;         // y, max envelope — at the mid-height shell seam
 brick_w_bot = 83.4;   // y at the bottom face (calipers 2026-08-09)
-brick_w_top = 83.4;   // y at the chamfer edge — assumed = bottom via a
-                      // symmetric draft (TODO calipers)
+brick_w_top = 83.4;   // y at the chamfer edge — symmetric draft (confirmed
+                      // by eye 2026-08-09, not calipered)
 brick_h = 44;         // z
 brick_chamfer = 6;    // top-face perimeter only
 brick_corner_r = 2.5; // vertical edges "lightly rounded" — eyeball value

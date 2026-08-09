@@ -77,13 +77,13 @@ boss_r = 3;             // keystone boss
 clr = 1.5;              // pocket clearance per side (matches right piece)
 wall = 4;
 // 1U: the brick (44) is taller than a 1U panel (43.65) — it fits only by
-// poaching the inter-U slack. The brick rides 2 below the panel's bottom
-// edge (the U below is empty) and tops out ~2.4 under the neighbor panel
-// above; the UCG mount's rear structure starts 1.75 above its own panel
-// edge, so real clearance there is ~4. Floor and walls start behind the
-// panel (z >= panel_t) so nothing shows under the panel from the front.
-shelf_y0 = panel_u == 1 ? -6 : 2;
+// poaching the inter-U slack. The brick tops out exactly at the panel's
+// top edge — 2.55 under the UCG mount above, whose rear structure starts
+// 1.75 above its own panel edge — and the floor + walls hang 4.35 into
+// the empty U below, tucked behind the panel face (z >= panel_t) so
+// nothing shows under the panel from the front.
 shelf_t = 4;
+shelf_y0 = panel_u == 1 ? panel_h - shelf_t - brick_h : 2;
 shelf_top = shelf_y0 + shelf_t;
 wall_y0 = panel_u == 1 ? shelf_top : shelf_y0;
 struct_z0 = panel_u == 1 ? panel_t : 0;   // sub-panel structure stays hidden
@@ -157,6 +157,9 @@ swin_w = (swin_z1 - swin_z0 - swin_rib) / 2;
 // behind the panel flank the tab housing: a wall with big windows.
 fwin_x = [[bay_x0 + 6, tab_slot_x0 - 4],
           [tab_slot_x0 + tab_slot_w + 4, bay_x1 - 6]];
+// third pocket, over the tab housing: the slot's keying walls and the
+// hold-down bar all live below slot_y1 — the column above is free
+fwin3_y0 = slot_y1 + 4;
 
 // ---- keystone ----
 // RJ45 handoff: patch cable from the ONT's rear GigE port to a keystone
@@ -325,6 +328,10 @@ module mount_left() {
                 offset(r = win_r) offset(delta = -win_r)
                     translate([xr[0], win_y0])
                         square([xr[1] - xr[0], win_y1 - win_y0]);
+        translate([0, 0, panel_t]) linear_extrude(body_z0 - panel_t + 1)
+            offset(r = win_r) offset(delta = -win_r)
+                translate([tab_slot_x0, fwin3_y0])
+                    square([tab_slot_w, win_y1 - fwin3_y0]);
         // round the cage's top-rear corner, across walls + eaves in one cut
         difference() {
             translate([bay_x0 - wall - 1, wall_top - cage_r, wall_z1 - cage_r])

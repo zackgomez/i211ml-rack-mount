@@ -197,17 +197,16 @@ the eave slope (the brick's chamfered top stands ~2 proud; the brow's
 wall carries two elongated-hex windows (45° pointed ends print
 bridge-free, corners r4, 8 rib between, rails tied to the
 shelf/eave/brick-face/rear-round lines); the front wall is a windowed
-frame — two through-pockets behind the panel flank the tab housing,
-keeping the full-perimeter brick stop, the slot's keying walls +
-hold-down bar, and the brow foundation.
+frame — three through-pockets behind the panel, two flanking the tab
+housing and one over it, keeping the full-perimeter brick stop, the
+slot's keying walls + hold-down bar, and the brow foundation.
 
 At 1U — the primary — the 44-tall brick beats the 43.65 panel only by
-poaching inter-U slack. It
-rides 2 below the panel's bottom edge — floor and walls tuck behind the
-panel face and hang into the U below, which is empty in this rack — and
-tops out ~2.4 under the neighbor panel above; the UCG mount directly
-above keeps its rear structure 1.75 proud of its own panel edge
-(measured from its STL), so real clearance there is ~4. At 1U the
+poaching inter-U slack: the brick tops out exactly at the panel's top
+edge (~2.55 under the UCG mount above, whose rear structure starts 1.75
+above its own panel edge, measured from its STL), and the floor + walls
+hang 4.35 into the U below — empty in this rack — tucked behind the
+panel face so nothing shows under the panel from the front. At 1U the
 keystone shifts to x = 60 and the gusset runout shortens to x = 44 to
 coexist; eaves, brow, tab slot, and joint holes (panel_h/2 pairs with
 the right piece at 1U) all re-derive.
