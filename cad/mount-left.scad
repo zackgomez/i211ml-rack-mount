@@ -57,7 +57,8 @@ nut_pocket_t = 6;       // pocket depth; the 4-thick web puts an M5x16 tip
 // edge is a concave quarter-circle fillet running out to the panel — a
 // little over half the plastic of the straight-hypotenuse triangle.
 ramp_t = 6;
-ramp_x1 = 70;
+ramp_x1 = panel_u == 1 ? 44 : 70;  // shorter runout at 1U clears the
+                                   // keystone boss (which shifts to x=60)
 ramp_inset = 6;
 
 // corner-rounding pass
@@ -74,9 +75,17 @@ boss_r = 3;             // keystone boss
 // ---- cage ----
 clr = 1.5;              // pocket clearance per side (matches right piece)
 wall = 4;
-shelf_y0 = 2;
+// 1U: the brick (44) is taller than a 1U panel (43.65) — it fits only by
+// poaching the inter-U slack. The brick rides 2 below the panel's bottom
+// edge (the U below is empty) and tops out ~2.4 under the neighbor panel
+// above; the UCG mount's rear structure starts 1.75 above its own panel
+// edge, so real clearance there is ~4. Floor and walls start behind the
+// panel (z >= panel_t) so nothing shows under the panel from the front.
+shelf_y0 = panel_u == 1 ? -6 : 2;
 shelf_t = 4;
 shelf_top = shelf_y0 + shelf_t;
+wall_y0 = panel_u == 1 ? shelf_top : shelf_y0;
+struct_z0 = panel_u == 1 ? panel_t : 0;   // sub-panel structure stays hidden
 
 // The cage sits just inboard of the rack ear: the UCG mount's structure
 // stops 22.9 from the panel edge and clears the rack post in this rack, so
@@ -97,7 +106,8 @@ wall_z1 = body_z1;                 // walls + eaves stop at the body rear face
 shelf_z1 = body_z1 + 12;           // shelf runs on under the shroud root
 
 brick_top = shelf_top + brick_h;
-wall_top = brick_top + 4;          // low walls — 2U leaves ~30 open above
+wall_top = min(brick_top + 4, panel_h);   // low walls; capped at the panel
+                                          // top for the 1U squeeze
 
 // ---- retention ----
 // Side eaves over the brick's 6 mm top-perimeter chamfer: same 45°-parallel
@@ -127,7 +137,8 @@ brow_z1 = body_z0 + brick_chamfer + 1;
 // this printer): opening 19.50 hook->latch x 15.05, lip 1.30, recesses and
 // ramps tracking the opening edges. Needs a 7-deep wall, so the panel gets
 // a local boss on its rear. Jack inserts from the rear, latch side up.
-key_x = 52;                      // center; free zone runs ~10..95
+key_x = panel_u == 1 ? 60 : 52;  // center; free zone runs ~10..95 (at 1U,
+                                 // past the shortened ramps)
 key_y = panel_h / 2;
 key_Lo = 19.50;                  // opening, hook->latch (prints ~19.25)
 key_W = 15.05;                   // opening, across (prints ~14.80)
@@ -158,8 +169,8 @@ module hex_holes(x0, x1, z0, z1) {
             x = x0 + hex_af / 2 + col * px + (row % 2 == 0 ? 0 : px / 2);
             z = z0 + hex_af / 2 + row * pz;
             if (x + hex_af / 2 <= x1)
-                translate([x, -1, z]) rotate([-90, 0, 0]) rotate([0, 0, 30])
-                    cylinder(h = shelf_t + 4, d = hex_af / cos(30), $fn = 6);
+                translate([x, shelf_y0 - 1, z]) rotate([-90, 0, 0]) rotate([0, 0, 30])
+                    cylinder(h = shelf_t + 2, d = hex_af / cos(30), $fn = 6);
         }
 }
 
@@ -227,19 +238,26 @@ module mount_left() {
             translate([bay_x0 - wall, shelf_top, 0])             // shelf, cage
                 rotate([90, 0, 0]) linear_extrude(shelf_t) hull() {  // only, rear
                     sw = cage_x1 - bay_x0 + wall;                // corners round
-                    square([sw, shelf_z1 - shelf_r]);
+                    translate([0, struct_z0])
+                        square([sw, shelf_z1 - shelf_r - struct_z0]);
                     for (x = [shelf_r, sw - shelf_r])
                         translate([x, shelf_z1 - shelf_r]) circle(shelf_r, $fn = 32);
                 }
-            translate([bay_x0 - wall, shelf_y0, 0])              // inner wall
-                cube([wall, wall_top - shelf_y0, wall_z1]);
-            translate([bay_x1, shelf_y0, 0])                     // outer wall
-                cube([wall, wall_top - shelf_y0, wall_z1]);
-            // front wall + brow: tab seat, forward stop, chamfer grab
+            translate([bay_x0 - wall, wall_y0, struct_z0])       // inner wall
+                cube([wall, wall_top - wall_y0, wall_z1 - struct_z0]);
+            translate([bay_x1, wall_y0, struct_z0])              // outer wall
+                cube([wall, wall_top - wall_y0, wall_z1 - struct_z0]);
+            // front wall + brow: tab seat, forward stop, chamfer grab (at 1U
+            // its below-panel portion steps back behind the panel face)
             translate([bay_x0, 0, 0]) rotate([90, 0, 90]) linear_extrude(bay_w)
-                polygon([[shelf_y0, 0], [shelf_y0, body_z0],
-                         [eave_y, body_z0], [eave_y + brow_z1 - body_z0, brow_z1],
-                         [wall_top, brow_z1], [wall_top, 0]]);
+                polygon(panel_u == 1
+                    ? [[0, 0], [0, panel_t], [shelf_top, panel_t],
+                       [shelf_top, body_z0], [eave_y, body_z0],
+                       [eave_y + brow_z1 - body_z0, brow_z1],
+                       [wall_top, brow_z1], [wall_top, 0]]
+                    : [[shelf_y0, 0], [shelf_y0, body_z0],
+                       [eave_y, body_z0], [eave_y + brow_z1 - body_z0, brow_z1],
+                       [wall_top, brow_z1], [wall_top, 0]]);
             // side eaves (they intentionally reach into the bay)
             translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
                 polygon([[bay_x0, eave_y], [bay_x0 + eave_depth, eave_y + eave_depth],

@@ -155,8 +155,18 @@ the ramps), shelf rear r6, keystone boss r3. Keystone slot at x = 52
 up, jack in from the rear: geometry is the coupon-validated recipe from
 `../voron-keystone-panel` (opening 19.50 × 15.05, lip 1.30, recesses +
 cam ramp) cut into a 7-thick boss on the panel rear. Rack ear ovals
-14 × 7 (UCG-style horizontal play). Walls stop 8 above the brick, not at
-the panel top — bump `wall_top` if the 2U face wants a fuller look.
+14 × 7 (UCG-style horizontal play). Walls stop 4 above the brick.
+
+A 1U variant exists (`panel_u = 1` → `stl/mount-left-1u.stl`): the
+44-tall brick beats the 43.65 panel only by poaching inter-U slack. It
+rides 2 below the panel's bottom edge — floor and walls tuck behind the
+panel face and hang into the U below, which is empty in this rack — and
+tops out ~2.4 under the neighbor panel above; the UCG mount directly
+above keeps its rear structure 1.75 proud of its own panel edge
+(measured from its STL), so real clearance there is ~4. At 1U the
+keystone shifts to x = 60 and the gusset runout shortens to x = 44 to
+coexist; eaves, brow, tab slot, and joint holes (panel_h/2 pairs with
+the right piece at 1U) all re-derive.
 
 ## Next steps
 
