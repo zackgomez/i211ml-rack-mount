@@ -23,7 +23,8 @@ show_devices = false;
 show_brick = true;      // ghost brick in preview (F5) only; not in render/STL
 
 // ---- rack geometry (keep in sync with mount.scad) ----
-panel_u = 2;            // the brick is 44 tall — 2U only
+panel_u = 1;            // 1U primary — the 44-tall brick pokes into the
+                        // empty U below (see shelf_y0); 2 still renders
 u_pitch = 44.45;
 panel_h = panel_u * u_pitch - 0.8;
 panel_t = 4;

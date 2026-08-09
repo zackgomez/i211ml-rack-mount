@@ -95,7 +95,11 @@ Ideas to carry over / decide:
 
 ## cad/
 
-OpenSCAD, parametric. `devices.scad` = reference solids of ONT + brick (fillet /
+OpenSCAD, parametric. Shared design language across both mounts:
+`wall` / `panel_t` / `shelf_t` = 4 — deliberately kept at 4 (each knob's
+4→3 saves only ~8–14 cm³ and spends stiffness exactly at the load
+paths: eave retention flex, rack-face flatness, zip-anchor webs).
+`devices.scad` = reference solids of ONT + brick (fillet /
 chamfer params still TODO-measure). `gauges.scad` = printable go/no-go gauges;
 pre-rendered STLs in `cad/stl/`:
 
@@ -111,11 +115,14 @@ down, no supports. Re-export:
 Mount STL + preview regeneration (from `cad/`):
 
 ```
-openscad --export-format=asciistl -o stl/mount-left-2u.stl mount-left.scad
-openscad --export-format=asciistl -D 'panel_u=1' -o stl/mount-left-1u.stl mount-left.scad
+openscad --export-format=asciistl -o stl/mount-left-1u.stl mount-left.scad
+openscad --export-format=asciistl -D 'panel_u=2' -o stl/mount-left-2u.stl mount-left.scad
+openscad --export-format=asciistl -o stl/mount-right-1u.stl mount.scad
 openscad -o mount-left-preview.png --imgsize=1600,1100 --viewall --autocenter \
     --camera=0,0,0,65,0,150,0 mount-left.scad   # -preview-rear.png: rz 150->30;
-                                                # 1U: add -D 'panel_u=1'
+                                                # -2u-preview: add -D 'panel_u=2';
+                                                # mount-right-render.png: same
+                                                # camera on mount.scad
 ```
 
 **ASA shrink protocol**: print gauges at 100%, in ASA, same profile as the final
@@ -129,19 +136,33 @@ the full 19" width as one piece.
 
 ## mount.scad — right half (ONT cage)
 
-UCG-Fiber-style module, panel printed flat on the bed, no supports. Test
-print v1 (2026-08-08, 1U, fast ASA): bay width spot-on (227 device / 230
-bay confirmed), eave friction at +0.2 squeeze overly tight → now −0.1
-(clearance); `eave_squeeze` is the tuning knob. Geometry is authored as a
-left and mirrored via `right_half = true` so the cage sits rack-RIGHT.
-The ONT rides on its feet (solid pads in the hex field, bosses hover);
-retention = side eaves + front brow hugging the chamfered edges. Fiber
-exits through the rear gap in the outer wall. `panel_u = 1` test / `2` final.
+UCG-Fiber-style module, panel printed flat on the bed, no supports; 1U
+primary (`panel_u`, 2 still renders). Test print v1 (2026-08-08, 1U,
+fast ASA): bay width spot-on (227 device / 230 bay confirmed), eave
+friction at +0.2 squeeze overly tight → now −0.1 (clearance);
+`eave_squeeze` is the tuning knob. Geometry is authored as a left and
+mirrored via `right_half = true` so the cage sits rack-RIGHT. The ONT
+rides on its feet (solid pads in the hex field, bosses hover); retention
+= side eaves + front brow hugging the chamfered edges, brick-cage style:
+both side walls run the full bay depth (the inner one continues 4 thick
+past the flange) with full-length eaves and the low eave-derived ceiling
+(`wall_top = eave_y + eave_depth + 3`; the flange keeps full panel
+height for the joint, the brow is panel-face material). The rear is
+fully open — fiber, coax, and cords all dress off the back. Each wall
+carries the same rounded elongated-hex windows as the brick cage (outer
+wall two, inner wall one behind the solid joint span, z-aligned so the
+cutouts read through the cage). Joint hardware: M5×16 button heads,
+inset Ø10.8 × 3 into the flange's bay-side face (ISO 7380 head 9.5 ×
+2.75 vs 1.5 bay clearance), nuts in the left piece's hex pockets.
+Roundings match mount-left: panel outer corners r4, cage top-rear r8,
+wall edges r2, flange top-rear r6, shelf rear r6.
 
 ## mount-left.scad — left half (brick enclosure)
 
-2U only (the brick is 44 tall), 217.6 wide, authored directly as a left.
-The brick lies flat on a hex-vented shelf, long axis along rack DEPTH:
+217.6 wide, authored directly as a left; 1U primary (`panel_u`, 2 still
+renders — see the variant paragraph below for how the 44-tall brick fits
+a 1U panel). The brick lies flat on a hex-vented shelf, long axis along
+rack DEPTH:
 wall-box tab end forward, cord/shroud end out the fully open rear (both
 cords + strain relief dress off the back). The bay sits OUTBOARD, just
 inboard of the rack ear, so the brick's weight hangs next to the mounting
@@ -180,8 +201,8 @@ frame — two through-pockets behind the panel flank the tab housing,
 keeping the full-perimeter brick stop, the slot's keying walls +
 hold-down bar, and the brow foundation.
 
-A 1U variant exists (`panel_u = 1` → `stl/mount-left-1u.stl`): the
-44-tall brick beats the 43.65 panel only by poaching inter-U slack. It
+At 1U — the primary — the 44-tall brick beats the 43.65 panel only by
+poaching inter-U slack. It
 rides 2 below the panel's bottom edge — floor and walls tuck behind the
 panel face and hang into the U below, which is empty in this rack — and
 tops out ~2.4 under the neighbor panel above; the UCG mount directly
@@ -195,19 +216,11 @@ the right piece at 1U) all re-derive.
 
 1. Caliper the foot center inset from the LED/port edges (est. 8 in
    devices.scad) + body cord y (`cordA_y`)
-2. Reprint right half, verify eave feel + foot pads
-3. Joint hardware pass on the right piece (left carries 10-thick flange +
-   nut pockets; right may want matching meat at `mate_z1`)
-4. Left half test print v1 done (2026-08-09): keystone perfect, rack +
-   joint hardware fit well; brick model corrected after (real −x tab +
-   drafted width) — reprint to confirm bay/tab/eave fit
-5. Material pass — left half done (hollowed side walls, windowed front
-   wall, low ceiling; −39 cm³ per variant). Remaining: the
-   primary-thickness discussion (`wall`/`panel_t`/`shelf_t` are shared
-   design language, cross-piece), the same hollowing for the ONT cage
-   (mount.scad), and the right piece's low-ceiling proposal. Then
-   1U-vs-2U call and final prints
-6. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
+2. Reprint both pieces at 1U with the material pass + joint insets:
+   right verifies eave feel + foot pads + button-head seating; left
+   verifies bay/tab/eave fit after the brick-model correction (its test
+   v1 2026-08-09: keystone perfect, rack + joint hardware fit well)
+3. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
 
 ## references/
 
