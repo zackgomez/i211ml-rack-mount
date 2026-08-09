@@ -31,7 +31,10 @@ piece_w = 265;
 slot_x = piece_w - edge_to_hole;     // rack slot center, from the joint edge
 
 // ---- hardware (specifics later) ----
-rack_slot_w = 10;       // oval slots for M6 cage-nut screws
+rack_slot_w = 14;       // oval slots for M6 cage-nut screws — widened for
+                        // horizontal play, UCG-style (Zack-general policy;
+                        // matches mount-left). Outer web to panel edge is
+                        // ~1.75 — same on both pieces, watch on test prints
 rack_slot_h = 7;
 mate_hole_d = 5.3;      // M5 joint screws through the mating flange
 
