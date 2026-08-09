@@ -153,8 +153,9 @@ module brick() {
             rotate([90, 0, 90])
                 linear_extrude(brick_l) polygon(_prof(brick_w, brick_h, brick_chamfer, false));
         }
+        // convexity hint stops the F5 see-through artifact on this groove
         translate([0, 0, brick_h / 2 - seam_h / 2])
-            linear_extrude(seam_h) difference() {
+            linear_extrude(seam_h, convexity = 10) difference() {
                 offset(delta = 1)  // overshoot outward to dodge coplanar faces
                     offset(r = brick_corner_r) offset(delta = -brick_corner_r)
                         square([brick_l, brick_w]);
