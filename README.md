@@ -16,6 +16,10 @@ The Alcatel manual claims 249 × 159 × 38 — trust the tape+calipers numbers b
 - 227 (x, tape) × 148 (y, *calipers*) × 33 mm (z, *calipers*)
 - 45° chamfer on ALL edges, face width 10.5 mm (*calipers*) → ~7.4 mm legs;
   the LED bevel is one of them
+- 4 rubber feet on the bottom, Ø11 × 3 tall (*calipers*): LED-side pair 1.5
+  from the x edges, port-side pair 20 from the x edges; center inset from the
+  LED/port edges est. 8 (TODO calipers). Also unmeasured mounting bosses,
+  shorter than the feet — the cage floats the ONT on its feet so bosses hover
 - Power input: 12 VDC / 2.5 A, keyed circular connector ("TELECOM EQUIPMENT DO NOT
   UNPLUG" collar), max draw 10.5 W — heat is a non-issue, token venting suffices
 
@@ -106,17 +110,26 @@ Rack-width shrink note: 0.5 % over the 465.1 mm ear-hole span is ~2.3 mm — the
 center-cage + two-wings + slotted joints architecture absorbs this; never print
 the full 19" width as one piece.
 
+## mount.scad — right half (ONT cage)
+
+UCG-Fiber-style module, panel printed flat on the bed, no supports. Test
+print v1 (2026-08-08, 1U, fast ASA): bay width spot-on (227 device / 230
+bay confirmed), eave friction at +0.2 squeeze overly tight → now −0.1
+(clearance); `eave_squeeze` is the tuning knob. Geometry is authored as a
+left and mirrored via `right_half = true` so the cage sits rack-RIGHT.
+The ONT rides on its feet (solid pads in the hex field, bosses hover);
+retention = side eaves + front brow hugging the chamfered edges. Fiber
+exits through the rear gap in the outer wall. `panel_u = 1` test / `2` final.
+
 ## Next steps
 
-Build order: RIGHT half first (ONT cage: LED bevel visible at front, open rear
-for cables, rack-ear + half-to-half joints sorted in this piece), then the LEFT
-half (brick). 1U vs 2U pending — see brick/tab discussion.
-
-1. Print the four gauges in ASA, check fit, record deltas in this README
-2. Model the right half (mount.scad)
-3. Print, iterate, model the left half
-4. Assemble, then the physical move (unplug SC/APC, unmount wall box,
-   re-route, replug)
+1. Caliper the foot center inset from the LED/port edges (est. 8 in
+   devices.scad) + body cord y (`cordA_y`)
+2. Reprint right half, verify eave feel + foot pads
+3. Joint hardware pass (more flange meat, hex-nut pockets on the left piece)
+4. Left half: brick cage + reach arm + ear (UCG left module pattern)
+5. Material-saving cutout pass, 2U flip, final prints
+6. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
 
 ## references/
 

@@ -30,10 +30,29 @@ ont_chamfer_face = 10.5;              // calipers, width of the 45° chamfer FAC
 ont_chamfer = ont_chamfer_face / sqrt(2);  // -> ~7.4 leg; ALL edges incl. LED bevel
 
 // Connector edge = one long (x) edge -> faces rack rear.
-// LED bevel = opposite long edge -> faces rack front.
+// LED bevel = opposite long edge -> faces rack front (model y = ont_w edge).
+
+// Rubber feet on the bottom face (calipers except inset depth). There are
+// also mounting bosses on the bottom, shorter than the feet — unmeasured;
+// the ONT rides on its feet so bosses just need to hover.
+foot_d = 11;
+foot_h = 3;
+foot_gap_led = 1.5;    // foot edge to device x edge, LED-side pair
+foot_gap_port = 20;    // port-side pair
+foot_inset = 8;        // TODO calipers — foot center to the LED/port edge
+
+ont_feet = [
+    [foot_gap_led + foot_d / 2,          ont_w - foot_inset],
+    [ont_l - foot_gap_led - foot_d / 2,  ont_w - foot_inset],
+    [foot_gap_port + foot_d / 2,         foot_inset],
+    [ont_l - foot_gap_port - foot_d / 2, foot_inset],
+];
 
 module ont() {
     chamfered_box(ont_l, ont_w, ont_h, ont_chamfer);
+    for (p = ont_feet)
+        translate([p[0], p[1], -foot_h])
+            cylinder(h = foot_h + 0.5, d = foot_d, $fn = 24);
 }
 
 // ---------------- Power brick ----------------
