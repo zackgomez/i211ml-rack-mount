@@ -14,6 +14,8 @@
 // relief hang out the open rear. devices y spans rack width with the
 // shroud side toward the joint, so the output cord exits next to the ONT
 // half; devices z is rack-vertical. The brick slides in from the rear.
+// The bay sits OUTBOARD (against the rack ear) so the brick's weight is
+// close to the mounting hardware; the keystone takes the joint side.
 
 include <devices.scad>
 show_devices = false;
@@ -32,8 +34,9 @@ right_piece_w = 265;                     // = mount.scad piece_w
 piece_w = rack_total_w - right_piece_w;  // 217.6
 slot_x = piece_w - edge_to_hole;         // rack slot center, from the joint edge
 
-rack_slot_w = 10;       // oval slots for M6 cage-nut screws
-rack_slot_h = 7;
+rack_slot_w = 14;       // oval slots for M6 cage-nut screws; wide like the
+rack_slot_h = 7;        // UCG mount's 13 x 6.5 — horizontal play absorbs
+                        // rack tolerance + ASA shrink over the panel width
 
 // ---- joint: this piece carries the nuts ----
 // M5 screws come through the right piece's 6-thick flange; hex pockets here
@@ -43,14 +46,17 @@ mate_hole_d = 5.3;
 mate_hole_z = [20, 48];
 flange_t = 10;          // "more meat" than the right piece's 6
 flange_z1 = 64;         // = mount.scad mate_z1
-nut_af = 8.4;           // M5 nut is 8.0 across flats — tune for press fit
+nut_af = 8.2;           // M5 nut is 8.0 across flats; the UCG mount's pockets
+                        // measure ~8.1 and press-fit on this printer (in-plane
+                        // holes print ~0.2 under) — tune here if loose/tight
 nut_pocket_t = 6;       // pocket depth; the 4-thick web puts an M5x16 tip
-                        // flush with the flange's corridor-side face
+                        // flush with the flange's inner face
 
-// Nut-access corridor: open gap between the flange and the inner cage wall
-// so nuts drop into their pockets from above/rear even with the brick
-// installed and the halves joined.
-corridor_w = 14;
+// Joint ramp: UCG-style triangular gusset bracing the flange's top edge to
+// the panel — full flange depth at the flange, 45° taper down the panel.
+// (The shelf already braces the flange's bottom edge along its full depth.)
+ramp_t = 6;
+ramp_x1 = 70;
 
 // ---- cage ----
 clr = 1.5;              // pocket clearance per side (matches right piece)
@@ -59,10 +65,13 @@ shelf_y0 = 2;
 shelf_t = 4;
 shelf_top = shelf_y0 + shelf_t;
 
-bay_x0 = flange_t + corridor_w + wall;   // inner wall's bay face
+// The cage hugs the rack ear: the UCG mount's structure stops 22.9 from the
+// panel edge and clears the rack post in this rack, so 23 is a proven margin.
+ear_clear = 23;
 bay_w = brick_w + 2 * clr;
-bay_x1 = bay_x0 + bay_w;
-cage_x1 = bay_x1 + wall;
+cage_x1 = piece_w - ear_clear;
+bay_x1 = cage_x1 - wall;
+bay_x0 = bay_x1 - bay_w;
 
 // depth chain: panel, front wall (tab seat), body, open rear
 tab_clr = 1;                       // gap from panel rear face to the tab tip
@@ -98,29 +107,33 @@ brow_z1 = body_z0 + brick_chamfer + 1;
 
 // ---- keystone ----
 // RJ45 handoff: patch cable from the ONT's rear GigE port to a keystone
-// jack in this panel's free area. Jack snaps in from the rear onto the
-// 1.6 web; the rear pocket clears the latch arms either way up.
-key_x = 158;                     // center; free zone runs ~123..196
+// jack, joint side of the panel. Slot geometry is the tuned recipe from
+// ../../voron-keystone-panel (tools/keystone_gen.py, coupon-validated on
+// this printer): opening 19.50 hook->latch x 15.05, lip 1.30, recesses and
+// ramps tracking the opening edges. Needs a 7-deep wall, so the panel gets
+// a local boss on its rear. Jack inserts from the rear, latch side up.
+key_x = 52;                      // center; free zone runs ~10..95
 key_y = panel_h / 2;
-key_w = 15.0;                    // through-opening
-key_h = 16.5;
-key_web = 1.6;                   // front web the keystone clips onto
-key_pocket_w = 22;               // rear relief around the clip arms
-key_pocket_h = 30;
+key_Lo = 19.50;                  // opening, hook->latch (prints ~19.25)
+key_W = 15.05;                   // opening, across (prints ~14.80)
+key_lip = 1.30;                  // lip the teeth clamp (prints ~1.55-1.60)
+key_wall = 7;                    // boss height the slot void needs
+key_boss = [30, 34];             // boss footprint (x, y)
 
 // ---- shelf venting + zip anchors ----
 hex_af = 13;            // hexagon across-flats
 hex_web = 3;            // material between hexes
 // Two slots just behind the body: a tie bridges them over the AC cord
-// (which exits at x ~104) and closes under the shelf — cord strain lands
-// on the mount, not on the brick.
+// and closes under the shelf — cord strain lands on the mount, not on
+// the brick.
 zip_slot = [6, 3];      // x, z
-zip_x = [96, 110];
+zip_x = [bay_x0 + clr + cordA_y - 8, bay_x0 + clr + cordA_y + 8];
 zip_z0 = body_z1 + 3.5;
 
 echo(str("piece_w=", piece_w, " panel_h=", panel_h, " bay_x0=", bay_x0,
          " cage_x1=", cage_x1, " body_z1=", body_z1, " shelf_z1=", shelf_z1,
-         " eave_y=", eave_y, " slot_x=", slot_x, " key_x=", key_x));
+         " eave_y=", eave_y, " slot_x=", slot_x, " key_x=", key_x,
+         " zip_x=", zip_x));
 
 module hex_holes(x0, x1, z0, z1) {
     px = hex_af + hex_web;
@@ -133,6 +146,38 @@ module hex_holes(x0, x1, z0, z1) {
                 translate([x, -1, z]) rotate([-90, 0, 0]) rotate([0, 0, 30])
                     cylinder(h = shelf_t + 4, d = hex_af / cos(30), $fn = 6);
         }
+}
+
+// Keystone slot void, straight port of keystone_gen.py: opening centered
+// at the origin, panel front face at z=0, +z into the panel, +y toward the
+// latch side. Subtract from a wall >= key_wall thick.
+module keystone_void() {
+    yb = -key_Lo / 2;
+    yt = key_Lo / 2;
+    difference() {
+        union() {
+            // channel: the jack body's through-path
+            translate([-key_W / 2, yb, -1.2]) cube([key_W, key_Lo, 8.7]);
+            // 0.35 x 0.5 lead-in chamfer around the face opening
+            hull() {
+                translate([-key_W / 2 - 0.35, yb - 0.35, -1.2])
+                    cube([key_W + 0.7, key_Lo + 0.7, 1.201]);
+                translate([-key_W / 2, yb, 0.499]) cube([key_W, key_Lo, 0.101]);
+            }
+            // hook side: 2.5-deep recess behind the lip, ramp out by z=6.1
+            translate([-key_W / 2, yb - 2.5, key_lip])
+                cube([key_W, 3, 3.6 - key_lip]);
+            translate([-key_W / 2, 0, 0]) rotate([90, 0, 90]) linear_extrude(key_W)
+                polygon([[yb - 2.5, 3.6], [yb, 6.1], [yb, 3.6]]);
+            // latch side: 2.05-deep recess
+            translate([-key_W / 2, yt - 0.5, key_lip])
+                cube([key_W, 2.55, 7.2 - key_lip]);
+        }
+        // insertion ramp that cams the latch shut as the jack goes in
+        translate([-(key_W + 0.6) / 2, 0, 0]) rotate([90, 0, 90])
+            linear_extrude(key_W + 0.6)
+                polygon([[yt + 2.06, 2.9], [yt - 1.8, 7.0], [yt + 2.06, 7.0]]);
+    }
 }
 
 module rack_slot() {
@@ -149,6 +194,11 @@ module mount_left() {
         union() {
             cube([piece_w, panel_h, panel_t]);                   // panel
             cube([flange_t, panel_h, flange_z1]);                // joint flange
+            translate([0, panel_h, 0]) rotate([90, 0, 0])        // joint ramp
+                linear_extrude(ramp_t) polygon([[0, 0], [0, flange_z1],
+                    [flange_t, flange_z1], [ramp_x1, panel_t], [ramp_x1, 0]]);
+            translate([key_x - key_boss[0] / 2, key_y - key_boss[1] / 2, 0])
+                cube([key_boss[0], key_boss[1], key_wall]);      // keystone boss
             translate([0, shelf_y0, 0])                          // shelf
                 cube([cage_x1, shelf_t, shelf_z1]);
             translate([bay_x0 - wall, shelf_y0, 0])              // inner wall
@@ -167,11 +217,8 @@ module mount_left() {
             cube([tab_slot_w, bar_y - shelf_top, bar_z1 - panel_t]);
         translate([tab_slot_x0, shelf_top, bar_z1])
             cube([tab_slot_w, slot_y1 - shelf_top, body_z0 - bar_z1 + 1]);
-        // keystone: opening through the front web, relief pocket behind
-        translate([key_x - key_w / 2, key_y - key_h / 2, -1])
-            cube([key_w, key_h, key_web + 1]);
-        translate([key_x - key_pocket_w / 2, key_y - key_pocket_h / 2, key_web])
-            cube([key_pocket_w, key_pocket_h, panel_t - key_web + 1]);
+        // keystone slot
+        translate([key_x, key_y, 0]) keystone_void();
         // rack slots
         for (y = [6.35, panel_h - 6.35])
             translate([slot_x, y, 0]) rack_slot();

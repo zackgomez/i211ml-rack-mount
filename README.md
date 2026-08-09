@@ -130,20 +130,25 @@ exits through the rear gap in the outer wall. `panel_u = 1` test / `2` final.
 2U only (the brick is 44 tall), 217.6 wide, authored directly as a left.
 The brick lies flat on a hex-vented shelf, long axis along rack DEPTH:
 wall-box tab end forward, cord/shroud end out the fully open rear (both
-cords + strain relief dress off the back). It slides in from the rear:
-side eaves grab the 6 mm top-perimeter chamfer (same `eave_squeeze` knob,
-−0.1), a front brow grabs the front-top chamfer, and the −x tab passes
-through a slot in the front wall with a hold-down bar riding 0.5 over its
-flat tip. Two zip-tie slots behind the body anchor the AC cord so tugs
-land on the mount, not the brick. Joint flange is 10 thick (right piece
-runs 6): M5 holes match mount.scad (y = panel_h/2, z 20/48), hex nut
-pockets (8.4 across flats, 6 deep over a 4 web — an M5×16 tip lands
-flush) open onto a 14 mm corridor between flange and cage wall, so nuts
-drop in from above/rear even with everything assembled. Keystone cutout
-(15.0 × 16.5 through a 1.6 web, 22 × 30 rear relief) centered at
-x = 158, y = panel_h/2 for the GigE patch handoff. Walls stop 8 above
-the brick, not at the panel top — bump `wall_top` if the 2U face wants
-a fuller look.
+cords + strain relief dress off the back). The bay sits OUTBOARD, against
+the rack ear, so the brick's weight hangs next to the mounting hardware —
+the cage stops 23 from the panel edge (the UCG mount's rack-proven
+margin). The brick slides in from the rear: side eaves grab the 6 mm
+top-perimeter chamfer (same `eave_squeeze` knob, −0.1), a front brow
+grabs the front-top chamfer, and the −x tab passes through a slot in the
+front wall with a hold-down bar riding 0.5 over its flat tip. Two
+zip-tie slots behind the body anchor the AC cord so tugs land on the
+mount, not the brick. Joint flange is 10 thick: M5 holes match mount.scad
+(y = panel_h/2, z 20/48); hex nut pockets 8.2 across flats (UCG pockets
+measure ~8.1 and press-fit on this printer), 6 deep over a 4 web — an
+M5×16 tip lands flush. A UCG-style gusset ramp braces the flange's top
+edge, full 64 depth tapering 45° to the panel by x=70; the shelf braces
+the bottom. Keystone slot at x = 52 (joint side), y = panel_h/2, latch
+up, jack in from the rear: geometry is the coupon-validated recipe from
+`../voron-keystone-panel` (opening 19.50 × 15.05, lip 1.30, recesses +
+cam ramp) cut into a 7-thick boss on the panel rear. Rack ear ovals
+14 × 7 (UCG-style horizontal play). Walls stop 8 above the brick, not at
+the panel top — bump `wall_top` if the 2U face wants a fuller look.
 
 ## Next steps
 
