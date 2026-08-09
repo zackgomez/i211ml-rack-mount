@@ -125,14 +125,36 @@ The ONT rides on its feet (solid pads in the hex field, bosses hover);
 retention = side eaves + front brow hugging the chamfered edges. Fiber
 exits through the rear gap in the outer wall. `panel_u = 1` test / `2` final.
 
+## mount-left.scad — left half (brick enclosure)
+
+2U only (the brick is 44 tall), 217.6 wide, authored directly as a left.
+The brick lies flat on a hex-vented shelf, long axis along rack DEPTH:
+wall-box tab end forward, cord/shroud end out the fully open rear (both
+cords + strain relief dress off the back). It slides in from the rear:
+side eaves grab the 6 mm top-perimeter chamfer (same `eave_squeeze` knob,
+−0.1), a front brow grabs the front-top chamfer, and the −x tab passes
+through a slot in the front wall with a hold-down bar riding 0.5 over its
+flat tip. Two zip-tie slots behind the body anchor the AC cord so tugs
+land on the mount, not the brick. Joint flange is 10 thick (right piece
+runs 6): M5 holes match mount.scad (y = panel_h/2, z 20/48), hex nut
+pockets (8.4 across flats, 6 deep over a 4 web — an M5×16 tip lands
+flush) open onto a 14 mm corridor between flange and cage wall, so nuts
+drop in from above/rear even with everything assembled. Keystone cutout
+(15.0 × 16.5 through a 1.6 web, 22 × 30 rear relief) centered at
+x = 158, y = panel_h/2 for the GigE patch handoff. Walls stop 8 above
+the brick, not at the panel top — bump `wall_top` if the 2U face wants
+a fuller look.
+
 ## Next steps
 
 1. Caliper the foot center inset from the LED/port edges (est. 8 in
    devices.scad) + body cord y (`cordA_y`)
 2. Reprint right half, verify eave feel + foot pads
-3. Joint hardware pass (more flange meat, hex-nut pockets on the left piece)
-4. Left half: brick cage + reach arm + ear (UCG left module pattern)
-5. Material-saving cutout pass, 2U flip, final prints
+3. Joint hardware pass on the right piece (left carries 10-thick flange +
+   nut pockets; right may want matching meat at `mate_z1`)
+4. Test-print left half: eave feel, tab slot fit, nut pocket press,
+   keystone snap
+5. Material-saving cutout pass, right-half 2U flip, final prints
 6. The physical move (unplug SC/APC, unmount wall box, re-route, replug)
 
 ## references/
