@@ -79,6 +79,7 @@ brow_z1 = 14;                        // rear extent; chamfer face ends at 12.9
 
 // LED window: the bevel is the ONT's top-front edge (chamfer face ~7.4).
 // Cap below the panel top so no fragile sliver strip remains above it.
+// TODO at 2U: enlarge the window (more height budget above the ONT).
 win_y0 = ont_y0 + ont_h - 9;
 win_y1 = min(ont_y0 + ont_h + 1.5, panel_h - 2);
 win_x0 = bay_x0 + 12;

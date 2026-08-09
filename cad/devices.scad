@@ -37,15 +37,18 @@ ont_chamfer = ont_chamfer_face / sqrt(2);  // -> ~7.4 leg; ALL edges incl. LED b
 // the ONT rides on its feet so bosses just need to hover.
 foot_d = 11;
 foot_h = 3;
-foot_gap_led = 1.5;    // foot edge to device x edge, LED-side pair
+// Foot gaps are measured from the CHAMFER edge (where the corner cut meets
+// the side), and each pair's gap applies on BOTH axes from its corner.
+foot_gap_led = 1.5;    // LED-side pair
 foot_gap_port = 20;    // port-side pair
-foot_inset = 8;        // TODO calipers — foot center to the LED/port edge
+f_led  = ont_chamfer + foot_gap_led  + foot_d / 2;   // center from corner
+f_port = ont_chamfer + foot_gap_port + foot_d / 2;
 
 ont_feet = [
-    [foot_gap_led + foot_d / 2,          ont_w - foot_inset],
-    [ont_l - foot_gap_led - foot_d / 2,  ont_w - foot_inset],
-    [foot_gap_port + foot_d / 2,         foot_inset],
-    [ont_l - foot_gap_port - foot_d / 2, foot_inset],
+    [f_led,          ont_w - f_led],
+    [ont_l - f_led,  ont_w - f_led],
+    [f_port,         f_port],
+    [ont_l - f_port, f_port],
 ];
 
 module ont() {
