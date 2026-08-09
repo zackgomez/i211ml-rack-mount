@@ -58,9 +58,6 @@ ont_y0 = shelf_y0 + shelf_t + foot_h;   // ONT body bottom — it rides on its
                                         // feet; bottom bosses hover
 bay_d = ont_w + 2 * clr;
 cage_z1 = panel_t + bay_d + wall;
-wall_top = panel_h;                  // walls run to the panel top: better
-                                     // print stability, fuller capture, and
-                                     // everything (walls/eaves/brow) is flush
 mate_z1 = 64;                        // mating flange depth — needs more meat
                                      // once joint hardware is chosen
 side_wall_z1 = 95;                   // outer wall stops here: the rear gap is
@@ -79,6 +76,11 @@ ont_top = ont_y0 + ont_h;
 // contact height of the 45° underside at each wall face (same both sides,
 // and at the panel rear face — front clearance is also clr)
 eave_y = ont_top - ont_chamfer - clr - eave_squeeze;
+// Low ceiling: walls/eaves stop 3 past the eave slope — all the capture is
+// in the chamfer grab, so nothing taller earns its plastic. The ONT's
+// chamfered top stands ~2.8 proud of the outer wall. (The flange stays
+// full panel height for the joint; the brow is panel-face material.)
+wall_top = eave_y + eave_depth + 3;
 
 // Front brow: extra meat on the panel's +y edge reaching +z past the ONT's
 // front-top chamfer, grabbing it with the same 45°-parallel underside. Only
