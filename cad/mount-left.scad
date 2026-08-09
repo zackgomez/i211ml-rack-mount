@@ -282,22 +282,35 @@ module mount_left() {
                     cylinder(h = cage_x1 - bay_x0 + wall + 4, r = cage_r, $fn = 48);
         }
         // round the cage's outer edges: the walls' top-outer edges (along z,
-        // starting behind the panel) and rear vertical edges (above the shelf)
+        // starting behind the panel) and rear vertical edges (above the
+        // shelf). The straight runs stop where the big r8 corner round
+        // begins; a quarter-torus section sweeps the same edge round along
+        // the r8 arc so the small round follows the big one seamlessly.
         for (p = [[bay_x0 - wall, 1], [cage_x1, -1]]) {
             xc = p[0] + p[1] * cage_er;         // cylinder center x
             xb = p[1] > 0 ? p[0] - 1 : p[0] - cage_er;   // cutter block x0
             difference() {
                 translate([xb, wall_top - cage_er, panel_t])
-                    cube([cage_er + 1, cage_er + 1, wall_z1 - panel_t + 1]);
+                    cube([cage_er + 1, cage_er + 1,
+                          wall_z1 - cage_r - panel_t + 0.01]);
                 translate([xc, wall_top - cage_er, panel_t - 0.5])
-                    cylinder(h = wall_z1 - panel_t + 2, r = cage_er, $fn = 24);
+                    cylinder(h = wall_z1 - cage_r - panel_t + 1, r = cage_er,
+                             $fn = 24);
             }
             difference() {
                 translate([xb, shelf_top, wall_z1 - cage_er])
-                    cube([cage_er + 1, wall_top - shelf_top + 1, cage_er + 1]);
+                    cube([cage_er + 1, wall_top - cage_r - shelf_top + 0.01,
+                          cage_er + 1]);
                 translate([xc, shelf_top - 0.5, wall_z1 - cage_er]) rotate([-90, 0, 0])
-                    cylinder(h = wall_top - shelf_top + 2, r = cage_er, $fn = 24);
+                    cylinder(h = wall_top - cage_r - shelf_top + 1, r = cage_er,
+                             $fn = 24);
             }
+            translate([0, wall_top - cage_r, wall_z1 - cage_r]) rotate([90, 0, 90])
+                rotate_extrude(angle = 90, $fn = 48) difference() {
+                    translate([cage_r - cage_er, min(xb, xc)])
+                        square([cage_er + 1, cage_er + 1]);
+                    translate([cage_r - cage_er, xc]) circle(cage_er, $fn = 24);
+                }
         }
         // round the flange's rear corners (tangent to the inset ramps)
         difference() {
