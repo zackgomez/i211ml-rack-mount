@@ -66,11 +66,11 @@ after test fit). History/context: `docs/left-half-brief.md`.
   printer. Propose before building anything you're unsure of; "propose"
   means show, don't apply.
 
-## Open follow-up (optional, fits stage 1)
+## Open follow-up (optional, fits stage 3)
 
-mount-left's ceiling still uses `wall_top = brick_top + 4`; the right
-piece just moved to the leaner eave-derived rule
-(`eave_y + eave_depth + 3`). Applying the same to mount-left saves
-another ~6 (2U) but the front-wall polygon's brow tip
-(`eave_y + brow_z1 - body_z0`) then pokes past wall_top — cap the brow
-reach or accept a small fin. Zack hasn't ruled on this; propose it.
+mount-left now uses the lean eave-derived ceiling
+(`wall_top = eave_y + eave_depth + 3`, brow reach tied to it). The right
+piece still runs `wall_top = panel_h` ("print stability, fuller capture,
+flush"). The same treatment there would save ~7 of full-thickness wall
+band at 1U — candidate for stage 3; propose to Zack and coordinate with
+the right-piece session.

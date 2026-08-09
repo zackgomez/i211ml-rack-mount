@@ -106,8 +106,6 @@ wall_z1 = body_z1;                 // walls + eaves stop at the body rear face
 shelf_z1 = body_z1 + 12;           // shelf runs on under the shroud root
 
 brick_top = shelf_top + brick_h;
-wall_top = min(brick_top + 4, panel_h);   // low walls; capped at the panel
-                                          // top for the 1U squeeze
 
 // ---- retention ----
 // Side eaves over the brick's 6 mm top-perimeter chamfer: same 45°-parallel
@@ -118,6 +116,11 @@ eave_depth = 3;
 eave_squeeze = -0.1;    // +interference / -clearance against the chamfer face
 eave_y = brick_top - brick_chamfer - clr - eave_squeeze
          - (brick_w - brick_w_top) / 2;
+// Low ceiling: walls/eaves stop 3 past the eave slope — all the capture is
+// in the chamfer grab. The brick's chamfered top stands ~2 proud of the
+// walls; the brow runs exactly to the wall top (its 45° underside still
+// spans the whole front chamfer face).
+wall_top = min(eave_y + eave_depth + 3, panel_h);
 
 // The front wall doubles as the tab seat: the -x wall-box tab (the big
 // offset one) passes through a slot to 2 short of the panel front, and a
@@ -130,8 +133,9 @@ bar_y = shelf_top + tabm_h_min + 0.5;  // bar underside just over the flat tip
 slot_y1 = shelf_top + tabm_h_max + 1.5;
 
 // Front brow over the brick's front-top chamfer (right piece's brow trick).
-// Full bay width — nothing to see on the brick's front face.
-brow_z1 = body_z0 + brick_chamfer + 1;
+// Full bay width — nothing to see on the brick's front face. Its reach is
+// tied to the wall top: the brow's 45° underside ends where the wall does.
+brow_z1 = body_z0 + (wall_top - eave_y);
 
 // ---- keystone ----
 // RJ45 handoff: patch cable from the ONT's rear GigE port to a keystone
@@ -237,16 +241,15 @@ module mount_left() {
             translate([bay_x1, wall_y0, struct_z0])              // outer wall
                 cube([wall, wall_top - wall_y0, wall_z1 - struct_z0]);
             // front wall + brow: tab seat, forward stop, chamfer grab (at 1U
-            // its below-panel portion steps back behind the panel face)
+            // its below-panel portion steps back behind the panel face).
+            // The brow's 45° rise ends exactly at the wall-top corner.
             translate([bay_x0, 0, 0]) rotate([90, 0, 90]) linear_extrude(bay_w)
                 polygon(panel_u == 1
                     ? [[0, 0], [0, panel_t], [shelf_top, panel_t],
                        [shelf_top, body_z0], [eave_y, body_z0],
-                       [eave_y + brow_z1 - body_z0, brow_z1],
                        [wall_top, brow_z1], [wall_top, 0]]
                     : [[shelf_y0, 0], [shelf_y0, body_z0],
-                       [eave_y, body_z0], [eave_y + brow_z1 - body_z0, brow_z1],
-                       [wall_top, brow_z1], [wall_top, 0]]);
+                       [eave_y, body_z0], [wall_top, brow_z1], [wall_top, 0]]);
             // side eaves (they intentionally reach into the bay)
             translate([0, 0, panel_t]) linear_extrude(wall_z1 - panel_t)
                 polygon([[bay_x0, eave_y], [bay_x0 + eave_depth, eave_y + eave_depth],
