@@ -52,11 +52,12 @@ nut_af = 8.2;           // M5 nut is 8.0 across flats; the UCG mount's pockets
 nut_pocket_t = 6;       // pocket depth; the 4-thick web puts an M5x16 tip
                         // flush with the flange's inner face
 
-// Joint ramp: UCG-style triangular gusset bracing the flange's top edge to
-// the panel — full flange depth at the flange, 45° taper down the panel.
-// (The shelf already braces the flange's bottom edge along its full depth.)
+// Joint ramps: UCG-style triangular gussets bracing the flange to the
+// panel, one near each panel edge, inset in y — full flange depth at the
+// flange, 45° taper down the panel.
 ramp_t = 6;
 ramp_x1 = 70;
+ramp_inset = 6;
 
 // ---- cage ----
 clr = 1.5;              // pocket clearance per side (matches right piece)
@@ -65,9 +66,10 @@ shelf_y0 = 2;
 shelf_t = 4;
 shelf_top = shelf_y0 + shelf_t;
 
-// The cage hugs the rack ear: the UCG mount's structure stops 22.9 from the
-// panel edge and clears the rack post in this rack, so 23 is a proven margin.
-ear_clear = 23;
+// The cage sits just inboard of the rack ear: the UCG mount's structure
+// stops 22.9 from the panel edge and clears the rack post in this rack, so
+// 23 is the proven minimum — 30 buys a little extra room at the post.
+ear_clear = 30;
 bay_w = brick_w + 2 * clr;
 cage_x1 = piece_w - ear_clear;
 bay_x1 = cage_x1 - wall;
@@ -194,13 +196,14 @@ module mount_left() {
         union() {
             cube([piece_w, panel_h, panel_t]);                   // panel
             cube([flange_t, panel_h, flange_z1]);                // joint flange
-            translate([0, panel_h, 0]) rotate([90, 0, 0])        // joint ramp
-                linear_extrude(ramp_t) polygon([[0, 0], [0, flange_z1],
-                    [flange_t, flange_z1], [ramp_x1, panel_t], [ramp_x1, 0]]);
+            for (y1 = [ramp_inset + ramp_t, panel_h - ramp_inset])  // joint ramps
+                translate([0, y1, 0]) rotate([90, 0, 0])
+                    linear_extrude(ramp_t) polygon([[0, 0], [0, flange_z1],
+                        [flange_t, flange_z1], [ramp_x1, panel_t], [ramp_x1, 0]]);
             translate([key_x - key_boss[0] / 2, key_y - key_boss[1] / 2, 0])
                 cube([key_boss[0], key_boss[1], key_wall]);      // keystone boss
-            translate([0, shelf_y0, 0])                          // shelf
-                cube([cage_x1, shelf_t, shelf_z1]);
+            translate([bay_x0 - wall, shelf_y0, 0])              // shelf, cage only
+                cube([cage_x1 - bay_x0 + wall, shelf_t, shelf_z1]);
             translate([bay_x0 - wall, shelf_y0, 0])              // inner wall
                 cube([wall, wall_top - shelf_y0, wall_z1]);
             translate([bay_x1, shelf_y0, 0])                     // outer wall
