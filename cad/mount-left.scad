@@ -177,8 +177,13 @@ key_d = 9.5;                     // boss depth = slot depth
 key_boss = [30, 34];             // boss footprint (x, y)
 
 // ---- shelf venting + zip anchors ----
-hex_af = 13;            // hexagon across-flats
-hex_web = 3;            // material between hexes
+// Hex grid copied from the UCG-Fiber shelf field (rack-proven on this
+// printer/settings). Scale matters, not just web: a point-up hex roof
+// closes with edges only 30° above horizontal, so the droop grows with
+// the hex — around af 13 the next row's vertical webs restart on the
+// droopy roof and detach mid-print. Keep this scale.
+hex_af = 8.66;          // hexagon across-flats (UCG field: R = 5)
+hex_web = 3.5;          // material between hexes
 // Two slots just behind the body: a tie bridges them over the AC cord
 // and closes under the shelf — cord strain lands on the mount, not on
 // the brick.
@@ -301,7 +306,7 @@ module mount_left() {
             translate([flange_t - nut_pocket_t, panel_h / 2, z]) rotate([0, 90, 0])
                 cylinder(h = nut_pocket_t + 0.01, d = nut_af / cos(30), $fn = 6);
         }
-        // shelf vents (6 side margin squeezes in a fifth hex column)
+        // shelf vents
         hex_holes(bay_x0 + 6, bay_x1 - 6, body_z0 + 8, body_z1 - 8);
         // zip-tie slots
         for (x = zip_x)

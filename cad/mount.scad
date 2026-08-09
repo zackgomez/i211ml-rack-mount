@@ -130,8 +130,11 @@ flange_r = 6;           // flange top-rear corner (the bottom one dies
 shelf_r = 6;            // shelf rear corners
 
 // shelf venting
-hex_af = 13;            // hexagon across-flats
-hex_web = 3;            // material between hexes
+// Hex grid copied from the UCG-Fiber shelf field (rack-proven on this
+// printer/settings) — see the sizing note in mount-left.scad: point-up
+// hex roofs droop with scale, and af ~13 sheds the next row's webs.
+hex_af = 8.66;          // hexagon across-flats (UCG field: R = 5)
+hex_web = 3.5;          // material between hexes
 
 // Solid landing pads in the hex field where the feet stand
 foot_keepout_r = foot_d / 2 + hex_af / 2 + 3;
