@@ -151,11 +151,13 @@ Rounded corners: panel outer corners r4 (sized to keep the ear-slot web),
 cage top-rear r8 across walls + eaves, cage outer edges r2 (wall
 top-outer along z, rear verticals), flange rear corners r6 (tangent to
 the ramps), shelf rear r6, keystone boss r3. Keystone slot at x = 52
-(joint side), y = panel_h/2, latch
-up, jack in from the rear: geometry is the coupon-validated recipe from
-`../voron-keystone-panel` (opening 19.50 × 15.05, lip 1.30, recesses +
-cam ramp) cut into a 7-thick boss on the panel rear. Rack ear ovals
-14 × 7 (UCG-style horizontal play). Walls stop 4 above the brick.
+(joint side), y = panel_h/2, face front, latch DOWN, jack in from the
+rear: geometry measured off the UCG "Shelf Keystone x6" left module —
+no tuned lip; the teeth wedge against tapered clamp faces (hook side
+6.35→12.15 over 4.9 deep, latch side 45° 10.15→12.15), 24.3 × 15.0
+cavity, and a rear plate whose 19.8 window guides the jack — cut into a
+9.5-thick boss on the panel rear. Rack ear ovals 14 × 7 (UCG-style
+horizontal play). Walls stop 4 above the brick.
 
 A 1U variant exists (`panel_u = 1` → `stl/mount-left-1u.stl`): the
 44-tall brick beats the 43.65 panel only by poaching inter-U slack. It
