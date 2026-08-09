@@ -97,7 +97,7 @@ wall_z1 = body_z1;                 // walls + eaves stop at the body rear face
 shelf_z1 = body_z1 + 12;           // shelf runs on under the shroud root
 
 brick_top = shelf_top + brick_h;
-wall_top = brick_top + 6;          // low walls — 2U leaves ~30 open above
+wall_top = brick_top + 4;          // low walls — 2U leaves ~30 open above
 
 // ---- retention ----
 // Side eaves over the brick's 6 mm top-perimeter chamfer: same 45°-parallel
