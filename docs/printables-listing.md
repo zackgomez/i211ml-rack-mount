@@ -22,11 +22,6 @@ no screws touching the devices.
 
 ## Description
 
-**Compatibility: Alcatel-Lucent / Nokia I-211M-L only** (the black GPON ONT
-Verizon/Frontier/Ziply installed for gigabit service, with its Verizon
-"Power OK" inline supply). The newer Nokia **G-211M-C is a different chassis
-and does NOT fit.**
-
 Two modules that bolt together into one 19" × 1U face:
 
 - **Right piece — ONT cage.** Hex-vented shelf, side eaves and a front brow
@@ -65,11 +60,10 @@ keep the dust caps on anything you unplug.*
 - Supports: none — EXCEPT `mount-left-1u.stl`, which needs a small support
   under the below-panel overlap (the few mm that dip into the U beneath).
   The 2U left piece and the right piece print support-free
-- Material: ASA proven (ABS fine; PETG likely OK for cool closets)
-- Walls: 3+ recommended (screw and tab areas)
-- Layer height: 0.2 mm; tested fine even on a fast profile
-- Infill: 15–20 %
-- Both pieces fit a 300+ mm bed (right piece is 265 mm wide)
+- As printed (the units in the photos): Polymaker ASA, 0.6 mm nozzle,
+  0.4 mm layers, 2 walls, 15 % infill
+- Bed: the right piece is 265 mm wide — printed diagonally on a 250 mm
+  Voron (just fits); 300 mm beds take it straight
 
 ## Assembly / hardware
 
