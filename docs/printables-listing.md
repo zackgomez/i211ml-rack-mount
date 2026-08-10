@@ -12,15 +12,18 @@ Category: Gadgets → Computers (or Hobby & Makers → Organizers)
 Tags: `rack-mount`, `19-inch`, `1u`, `verizon`, `fios`, `ont`, `i-211m-l`,
 `homelab`, `server-rack`, `network`, `openscad`, `asa`
 
-## Summary (short description)
+## Summary (120-char limit)
+
+Two-piece 1U rack mount for the Verizon FiOS I-211M-L ONT and its power
+brick — LED window, keystone, tool-free fit.
+
+## Description
 
 Moves the Verizon FiOS I-211M-L ONT and its "Power OK" power brick out of
 the wall box and into a 19" rack: a two-piece 1U mount with a status-LED
 window, keystone passthrough for the ethernet handoff, and tool-free
 friction retention that hugs the devices' chamfered edges — no straps,
 no screws touching the devices.
-
-## Description
 
 Two modules that bolt together into one 19" × 1U face:
 
