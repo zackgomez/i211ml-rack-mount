@@ -52,13 +52,19 @@ Printed in ASA and living in my rack (photos). OpenSCAD source, full
 device measurements, and the design/build log:
 https://github.com/zackgomez/i211ml-rack-mount
 
+Designed in collaboration with Claude (Fable 5) — co-authored per the
+repo's git history.
+
 *This is a fan-made mount; not affiliated with Verizon. The ONT remains
 your ISP's property — relocate gently, mind the fiber bend radius, and
 keep the dust caps on anything you unplug.*
 
 ## Print settings
 
-- Orientation: front panel flat on the bed (as exported) — no supports
+- Orientation: front panel flat on the bed (as exported)
+- Supports: none — EXCEPT `mount-left-1u.stl`, which needs a small support
+  under the below-panel overlap (the few mm that dip into the U beneath).
+  The 2U left piece and the right piece print support-free
 - Material: ASA proven (ABS fine; PETG likely OK for cool closets)
 - Walls: 3+ recommended (screw and tab areas)
 - Layer height: 0.2 mm; tested fine even on a fast profile
@@ -85,8 +91,11 @@ Photos (from `photos/`):
 - `installed-front.jpg` — **cover image** (LEDs through the window, in-rack)
 - `installed-rear.jpg`  — rear cable dressing
 - `bench-assembled.jpg` — both devices loaded, on the bench
-- optionally `cad/mount-right-render.png` + a mount-left render for geometry views
 
-License suggestion: **CC BY-NC-SA** (share/remix with credit, no commercial
-resale — there's a shop charging $83 for prints of a similar mount) or
-**CC BY-SA** if you don't care. Pick in the upload form.
+Renders (from `cad/`):
+- `render-assembly-front.png` — both pieces joined, interior view
+- `render-right-iso.png` — ONT cage with ghosted ONT (shows retention)
+- `render-left-iso.png`  — brick cage with ghosted brick
+
+License: **CC BY 4.0** — matches "public domain + please credit me";
+attribution is the only requirement, commercial use allowed.
