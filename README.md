@@ -1,5 +1,8 @@
 # Verizon ONT I-211M-L — 19" Rack Mount
 
+**Published**: https://www.printables.com/model/1806857-verizon-fios-i-211m-l-ont-power-brick-19-rack-moun
+(CC BY 4.0). Installed and in service 2026-08-10 — ONT in the rack, on the UPS.
+
 Design and print a 1U (or 2U) rack mount for the Verizon FiOS ONT (Alcatel-Lucent
 I-211M-L) plus its inline power brick, so the ONT moves from the basement wall box
 into the server rack. Fiber arrives as a stiff black drop, coiled/anchored in the
